@@ -1,25 +1,23 @@
-class Tag(object):
+class Tag_Type(object):
 	"""docstring for Tag"""
 	def __init__(self):
 
 		# Operadores
-		self.OP_EQ = 'OP_EQ'
-		self.OP_NE = 'OP_NE'
-		self.OP_GT = 'OP_GT'
-		self.OP_LT = 'OP_LT'
-		self.OP_GE = 'OP_GE'
-		self.OP_LE = 'OP_LE'
-		self.OP_AD = 'OP_AD'
-		self.OP_MIN = 'OP_MIN'
-		self.OP_MUL = 'OP_MUL'
-		self.OP_DIV = 'OP_DIV'
-		self.OP_ASS = "OP_ASS"
-
-
-    @classmethod
-    def get_op(self):
-        return self.OP_EQ
-
+		OP_EQ = 'OP_EQ'
+		OP_NE = 'OP_NE'
+		OP_GT = 'OP_GT'
+		OP_LT = 'OP_LT'
+		OP_GE = 'OP_GE'
+		OP_LE = 'OP_LE'
+		OP_AD = 'OP_AD'
+		OP_MIN = 'OP_MIN'
+		OP_MUL = 'OP_MUL'
+		OP_DIV = 'OP_DIV'
+		OP_ASS = "OP_ASS"
+        # Palavrs Recervadas
+        KW = 'KW'        
+        # ID
+        ID = 'ID'
 '''
     	# Simbolos
     	self.SMB_OBC = 'SMB_OBC'
@@ -29,8 +27,7 @@ class Tag(object):
     	self.SMB_COM = 'SMB_COM'
     	self.SMB_SEM = 'SMB_SEM'
 
-    	# ID
-    	self.ID = 'ID'
+    	
 
     	# Constantes
     	self.CON_NUM = 'CON_NUM'
@@ -40,6 +37,4 @@ class Tag(object):
     	# Literal
     	self.LITERAL = 'LITERAL'
 
-    	# Palavrs Recervadas
-    	self.KW = 'KW'
 '''

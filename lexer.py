@@ -1,5 +1,9 @@
 import time
-from Tabela_Simbolo import TabelaSimbolo
+import sys
+from tabela_simbolo import TabelaSimbolo
+from token import Token
+from tag import Tag_Type
+from random import *
 class Lexer(object):
 	"""docstring for Lexer"""
 	def __init__(self, input_file):
@@ -10,8 +14,9 @@ class Lexer(object):
 		self.n_column = 0
 		self._caracter = ''
 		self.__estado = 1
-		self.__lexema = []
+		self.__list_lexema = []
 		self.__ponteiro = 0
+		self.lexema = []
 		#print >>sys.stderr,'Terminando'
 		try:
 			self.__file = open(input_file,'r')
@@ -19,29 +24,35 @@ class Lexer(object):
 			print "Erro to open file."
 
 
-
-
-	def get_pointer(self):		
+	def pointer_file(self):		
 		self.__file.seek(self.__file.tell() - 1)
 
 	def nex_token(self):
 
 		while True:
-			print "TELLLllllllllllll", self.__file.tell()
-			self.c = self.__file.read(1)
+			self.n_column = self.n_column + 1 
+
+			# Ler arquivo
+			try:
+				self.c = self.__file.read(1)
+			except IOError as e:
+				raise e
+			
+			# Se chegar no fim do arquivo
 			if not self.c:
-				print "End of file"
 				return False
 
 			time.sleep(0.3)
 			
 			print "Read a character:", self.c
-			if self.__estado == 1:
+			if self.__estado == 1: # Case 1
 				if not self.c:
 					print "End of file"
 					return False
 
 				elif self.c == "\n":
+					self.n_linha = self.n_linha + 1
+					self.n_column = 0
 					pass
 				elif self.c == '\t':
 					pass
@@ -49,93 +60,33 @@ class Lexer(object):
 					pass
 
 				elif self.c.isalpha():
-					self.__lexema.append(self.c)
+					self.__list_lexema.append(self.c)
 					self.__estado = 2
 
-  			elif self.__estado == 2:
+  			elif self.__estado == 2: # Case 2
   				if self.c.isalpha() or self.c.isdigit():
-  					self.__lexema.append(self.c)
+  					self.__list_lexema.append(self.c)
   				else:
-  					self.__estado = 1
-  					print self.get_pointer()  	
-  					return self.__lexema
+  					self.__estado = 1 # Retorna para o comeco
+  					self.lexema = self.__list_lexema
+  					self.__list_lexema = []
+  					 	
+  					token =  self.__TS.get_token(''.join(map(str, self.lexema))) # converte lista em string
+
+  					if token == None: 
+  						# se nao encontrar na tabela de simbolo, insere.
+  						token = Token(Tag_Type.ID, ''.join(map(str, self.lexema)), self.n_linha, self.n_column)
+	  					self.__TS.put_tabela_simbolo(token, randint(21,100))
+	  					return token # retorna o novo token
   					
-  					
-  			
-'''
-	def next_tonken(self):
+  					return token
 
-
-		for c in range(self.__ponteiro, len(self.__lookahead)):
-			
-			
-			print "CCCCCC", c
-			print "ponteirooooo", self.__ponteiro
-			self.__ponteiro = self.__ponteiro + 1
-			self.n_column = self.n_column + 1
-			print "ESTADO", self.__estado
-			print "CARACTER", self.__lookahead[c]
-			if self.__estado == 1:		# Case 1
-
-				if ((c+1) == len(self.__lookahead)):					
-					return "fim arquivo"
-
-
-				elif self.__lookahead[c] == "\n":						
-					print "QUEBRA LINHA"
-					#self.n_linha = self.n_linha + 1
-					#self.n_column = 0
-				
-				elif self.__lookahead[c] == "\t":
-					print "TABULACAO"
-					#self.n_linha = self.n_linha + 3
-				elif self.__lookahead[c] == ' ':
-					print "ESPACO"
-				
-				elif self.__lookahead[c].isalpha():						
-					print "IS ALPHA"
-
-					self.__lexema.append(self.__lookahead[c])
-					self.__estado = 2
-
-				elif self.__lookahead[c] == ";":
-					self.__ponteiro = self.__ponteiro - 1
-					print "PARENTESE"
-
-				elif self.__lookahead[c] == "}":
-					self.__ponteiro = self.__ponteiro - 1
-					print "TOKEM = }"
-
-
-
-			elif self.__estado == 2:	# Case 2
-				
-				if self.__lookahead[c].isalpha() or self.__lookahead[c].isdigit():
-					self.__lexema.append(self.__lookahead[c])
-					
-					if ((c+1) == len(self.__lookahead)):					
-						print "LEXEMAs", self.__lexema
-					
-
-				else: # estado = 3
-					
-					self.__ponteiro = self.__ponteiro - 1
-					print "lexema", self.__lexema
-					self.__estado = 1
-					self.__lexema = []
-
-
-			elif self.__estado == 3:
-				print "EST 3"
-				self.__estado = 1
-		
-'''
 
 def main():
 	lexer = Lexer('HelloJavinha.jvn')
 	while True:
 		token = lexer.nex_token()
-		print token
+		print >>sys.stderr, "Token: " + str(token.toString())  + "Linha: " + str(lexer.n_linha) + " Coluna: " + str(lexer.n_column)
 		if token == False:
 			return
 

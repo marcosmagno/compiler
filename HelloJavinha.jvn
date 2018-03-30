@@ -1,7 +1,8 @@
-puublic class HelloJavinha
-integer data_entrega;
-string msgm;
-
-data_entrega = 29 * 11 * 17;
-	SystemOutDispln("Caros alunos, O TP ja esta disponivel.");
+public class marcos
+  integer data_entrega;
+  string msgm;
+  if i = 0;
+  data_entrega = 29 * 11 * 17;
+  msgm = "Caros alunos, O TP1 ja esta disponivel. Bom trabalho!";
+  SystemOutDispln(msgm + " " + data_entrega);
 end
