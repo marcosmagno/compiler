@@ -17,6 +17,8 @@ class Lexer(object):
 		self.__list_lexema = []
 		self.__ponteiro = 0
 		self.lexema = []
+		self.__list_digit = []
+		self.digit = []
 
 		try:
 			self.__file = open(input_file,'r')
@@ -77,8 +79,6 @@ class Lexer(object):
 					self.__estado = 1 # estado 14
 					return Token(Tag_Type.OP_AD, "+", self.n_linha, self.n_column)
 
-
-
 				elif self.c == "{":
 					self.__estado = 1 # estado 25
 					return Token(Tag_Type.SMB_OBC, "{", self.n_linha, self.n_column)					
@@ -89,7 +89,7 @@ class Lexer(object):
 				
 				elif self.c == "(":
 					self.__estado = 1 # estado 27
-					return Token(Tag_Type.SBM_OPA, "(", self.n_linha, self.n_column)	
+					return Token(Tag_Type.SMB_OPA, "(", self.n_linha, self.n_column)	
 
 				elif self.c == ")":
 					self.__estado = 1 # estado 28
@@ -103,6 +103,10 @@ class Lexer(object):
 					self.__estado = 1 # estado 30
 					return Token(Tag_Type.SMB_SEM, ";", self.n_linha, self.n_column)					
 			
+
+				elif self.c.isdigit():
+					self.__list_digit.append(self.c)
+					self.__estado = 31
 
 				elif self.c.isalpha():					
 					self.__list_lexema.append(self.c)					
@@ -152,13 +156,11 @@ class Lexer(object):
 
 
   			elif self.__estado == 14: # Case 2
-
   				if self.c.isalpha() or self.c.isdigit(): 
   					self.__list_lexema.append(self.c)
 
   				else:
   					self.__estado = 1 # Retorna para o comeco
-
   					self.lexema = self.__list_lexema
   					self.__list_lexema = []
   					
@@ -172,6 +174,33 @@ class Lexer(object):
 	  					return token # retorna o novo token
   					
   					return token
+
+  			elif self.__estado == 31:
+  				if self.c.isdigit():
+  					self.__list_digit.append(self.c)
+  				else:
+  					if self.c == ".":
+  						self.__list_digit.append(self.c)
+  						self.__estado = 32
+  					else:
+	  					self.__estado = 1
+	  					self.digit = self.__list_digit
+	  					self.__list_digit = []
+	  					self.pointer_file()
+	  					return Token(Tag_Type.INTEGER, ''.join(map(str, self.digit)), self.n_linha, self.n_column)
+
+  			elif self.__estado == 32:
+  				if self.c.isdigit():
+  					self.__list_digit.append(self.c)
+  					
+  				else:
+  					self.__estado = 1
+  					self.pointer_file()
+  					return Token(Tag_Type.DOUBLE, ''.join(map(str, self.__list_digit)), self.n_linha, self.n_column)
+  					
+  					
+  				
+
 
 
 def main():

@@ -39,3 +39,7 @@ class Tag_Type(object):
     # Constante Char
     CON_CHAR = "CON_CHAR"
 
+    # Digit
+    INTEGER = "INTEGER"
+    DOUBLE = "DOUBLE"
+
