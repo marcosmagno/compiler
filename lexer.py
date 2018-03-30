@@ -35,7 +35,7 @@ class Lexer(object):
 
 			# Ler arquivo
 			try:
-				self.c = self.__file.read(1)
+				self.c = self.__file.read(1)				
 				if not self.c:
 					return Token(Tag_Type.EOF, "EOF", self.n_linha, self.n_column)				
 
@@ -77,23 +77,37 @@ class Lexer(object):
 					self.__estado = 1 # estado 14
 					return Token(Tag_Type.OP_AD, "+", self.n_linha, self.n_column)
 
-				elif self.c == "*":
-					if self.c == "/":
-						self.__estado = 17 # estado 17
-					else:
-						return Token(Tag_Type.OP_MUL, "*", self.n_linha, self.n_column)
 
-				elif self.c == "/":
-					self.__estado = 16 # estado 16
-					
 
+				elif self.c == "{":
+					self.__estado = 1 # estado 25
+					return Token(Tag_Type.SMB_OBC, "{", self.n_linha, self.n_column)					
+				
+				elif self.c == "}":
+					self.__estado = 1 # estado 26
+					return Token(Tag_Type.SMB_CBC, "{", self.n_linha, self.n_column)					
+				
+				elif self.c == "(":
+					self.__estado = 1 # estado 27
+					return Token(Tag_Type.SBM_OPA, "(", self.n_linha, self.n_column)	
+
+				elif self.c == ")":
+					self.__estado = 1 # estado 28
+					return Token(Tag_Type.SMB_CPA, ")", self.n_linha, self.n_column)					
+				
+				elif self.c == ",":
+					self.__estado = 1 # estado 29
+					return Token(Tag_Type.SMB_COM, ",", self.n_linha, self.n_column)					
+
+				elif self.c == ";":
+					self.__estado = 1 # estado 30
+					return Token(Tag_Type.SMB_SEM, ";", self.n_linha, self.n_column)					
+			
 
 				elif self.c.isalpha():					
 					self.__list_lexema.append(self.c)					
 					self.__estado = 14
-
-				elif self.c == ";":
-					pass
+	
 
 			elif self.__estado == 2: # CASE 2
 				if self.c == "=":
@@ -134,35 +148,13 @@ class Lexer(object):
 					print "Token Incompleto" #implemntar mensagem de error
 					return None
 
-			elif self.__estado == 16: # CASE 16
-				if self.c == "/":
-					self.__estado = 21
-					pass
-				elif self.c == "*":
-					self.__estado = 17
-
-
-				else:
-					self.__estado = 1
-					self.pointer_file()
-					return Token(Tag_Type.OP_DIV, "/", self.n_linha, self.n_column)
-
-			elif self.__estado == 21:
-				if self.c == "\n":
-					self.__estado = 1
-
-			elif self.__estado == 17:
-				if self.c == "*":
-					if self.c == "/":
-						self.__estado = 1
-
+	
 
 
   			elif self.__estado == 14: # Case 2
 
   				if self.c.isalpha() or self.c.isdigit(): 
   					self.__list_lexema.append(self.c)
-
 
   				else:
   					self.__estado = 1 # Retorna para o comeco
