@@ -54,7 +54,7 @@ class TabelaSimbolo(object):
 
 	def put_tabela_simbolo(self, w,i):
 		self.tabela_simbolo[i] = w
-		print "INSERINDO NA TABELA DE SIMBOLO", self.tabela_simbolo.keys()
+
 
 	def get_token(self, lexema):
 
