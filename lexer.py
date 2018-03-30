@@ -15,16 +15,57 @@ class Lexer(object):
 		#print >>sys.stderr,'Terminando'
 		try:
 			self.__file = open(input_file,'r')
-			self.__lookahead = self.__file.read()
-
 		except IOError as e:
 			print "Erro to open file."
 
 
 
+
+	def get_pointer(self):		
+		self.__file.seek(self.__file.tell() - 1)
+
+	def nex_token(self):
+
+		while True:
+			print "TELLLllllllllllll", self.__file.tell()
+			self.c = self.__file.read(1)
+			if not self.c:
+				print "End of file"
+				return False
+
+			time.sleep(0.3)
+			
+			print "Read a character:", self.c
+			if self.__estado == 1:
+				if not self.c:
+					print "End of file"
+					return False
+
+				elif self.c == "\n":
+					pass
+				elif self.c == '\t':
+					pass
+				elif self.c == " ":
+					pass
+
+				elif self.c.isalpha():
+					self.__lexema.append(self.c)
+					self.__estado = 2
+
+  			elif self.__estado == 2:
+  				if self.c.isalpha() or self.c.isdigit():
+  					self.__lexema.append(self.c)
+  				else:
+  					self.__estado = 1
+  					print self.get_pointer()  	
+  					return self.__lexema
+  					
+  					
+  			
+'''
 	def next_tonken(self):
 
-	
+
 		for c in range(self.__ponteiro, len(self.__lookahead)):
 			
 			
@@ -88,16 +129,15 @@ class Lexer(object):
 				print "EST 3"
 				self.__estado = 1
 		
-
+'''
 
 def main():
 	lexer = Lexer('HelloJavinha.jvn')
 	while True:
-		 token = lexer.next_tonken()
-		 print token
-		 if token == None:
-		 	break
-	
+		token = lexer.nex_token()
+		print token
+		if token == False:
+			return
 
 
 if __name__ == '__main__':
