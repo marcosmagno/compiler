@@ -57,7 +57,7 @@ class TabelaSimbolo(object):
 
 
 	def get_token(self, lexema):
-
+		
 		for k, token in self.tabela_simbolo.iteritems():
 			if token.getLexema() == lexema:
 				return token

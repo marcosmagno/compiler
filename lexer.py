@@ -11,7 +11,7 @@ class Lexer(object):
 		self.__END_OF_FILE = -1
 		self.__lookahead = 0
 		self.n_linha = 1
-		self.n_column = 0
+		self.n_column = 1
 		self._caracter = ''
 		self.__estado = 1
 		self.__list_lexema = []
@@ -25,8 +25,10 @@ class Lexer(object):
 		except IOError as e:
 			print "Erro to open file."
 
-
 	def pointer_file(self):
+		self.__file.seek(self.__file.tell() - 1)
+
+	def mode_panic(self):
 		self.__file.seek(self.__file.tell() - 1)
 
 	def nex_token(self):
@@ -44,20 +46,21 @@ class Lexer(object):
 
 			except IOError as e:
 				raise e		
-	
+			#print self.c, self.n_column
+			#time.sleep(0.5)
 			if self.__estado == 1: # CASE 1
 				if not self.c:					
 					return Token(Tag_Type.EOF, "EOF", self.n_linha, self.n_column)				
 				
 				elif self.c == "\n":
 					self.n_linha = self.n_linha + 1
-					self.n_column = 0
+					self.n_column = 1
 					pass
 
 				elif self.c == '\t':
 					pass
 
-				elif self.c == " ":
+				elif self.c == " ":					 
 					pass
 
 				elif self.c == "<":
@@ -125,6 +128,8 @@ class Lexer(object):
 				else:
 					self.__estado = 1
 					self.pointer_file()
+					self.n_column = self.n_column - 1
+
 					return Token(Tag_Type.OP_LT, "<", self.n_linha, self.n_column)
 
 
@@ -135,6 +140,7 @@ class Lexer(object):
 				else:
 					self.__estado = 1 # estado 7
 					self.pointer_file()
+					self.n_column = self.n_column - 1
 					return Token(Tag_Type.OP_ASS, "=", self.n_linha, self.n_column)					
 
 			
@@ -145,6 +151,7 @@ class Lexer(object):
 				else:
 					self.__estado = 1 # estado 10
 					self.pointer_file()
+					self.n_column = self.n_column - 1
 					return Token(Tag_Type.OP_GT, "=", self.n_linha, self.n_column)					
 
 			elif self.__estado == 11: # CASE 11
@@ -153,9 +160,10 @@ class Lexer(object):
 					return Token(Tag_Type.OP_NE, "!=", self.n_linha, self.n_column)
 				else:
 					self.__estado = 1 # estado 13
-					self.pointer_file()
-					print "Token Incompleto" #implemntar mensagem de error
-					return None
+					#self.pointer_file()
+					self.n_column = self.n_column - 1
+					print >>sys.stderr, "   ", "File ", self.__file.name, " \n\n\tLinha:", self.n_linha , " Coluna: ", self.n_column, "\n\t invalid", "\n\n\t expected ="
+					self.mode_panic()
 
   			elif self.__estado == 31: # CASE 31
   				if self.c.isdigit():
@@ -169,6 +177,7 @@ class Lexer(object):
 	  					self.digit = self.__list_digit
 	  					self.__list_digit = []
 	  					self.pointer_file()
+	  					self.n_column = self.n_column - 1
 	  					return Token(Tag_Type.INTEGER, ''.join(map(str, self.digit)), self.n_linha, self.n_column)
 
   			elif self.__estado == 32:  # CASE 31
@@ -178,6 +187,7 @@ class Lexer(object):
   				else:
   					self.__estado = 1	# estado 34
   					self.pointer_file()
+  					self.n_column = self.n_column - 1
   					return Token(Tag_Type.DOUBLE, ''.join(map(str, self.__list_digit)), self.n_linha, self.n_column)
   			
 
@@ -191,12 +201,13 @@ class Lexer(object):
   					self.__list_lexema = []
   					
 
-  					token =  self.__TS.get_token(''.join(map(str, self.lexema))) # converte lista em string
+  					token =  self.__TS.get_token(''.join(map(str, self.lexema))) # Pesquisa na Tabela de Simbolo
   					self.pointer_file()
+  					self.n_column = self.n_column - 1
   					if token == None: 
   						# se nao encontrar na tabela de simbolo, insere.
   						token = Token(Tag_Type.ID, ''.join(map(str, self.lexema)), self.n_linha, self.n_column)
-	  					self.__TS.put_tabela_simbolo(token, randint(21,100))
+	  					self.__TS.put_tabela_simbolo(token, randint(21,100)) # Cadastra na Tabela de Simbolo
 	  					return token # retorna o novo token  					
   					return token
 
