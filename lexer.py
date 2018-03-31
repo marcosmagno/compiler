@@ -56,6 +56,8 @@ class Lexer(object):
 		This method handles the input file
 		Scroll through each character of the file
 		Returns a token when found
+		TODO:
+			Alter state
 			
 		'''
 		self.count_literal = 0
