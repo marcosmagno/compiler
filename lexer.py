@@ -28,7 +28,7 @@ class Lexer(object):
 	def pointer_file(self):
 		self.__file.seek(self.__file.tell() - 1)
 
-	def mode_panic(self):
+	def panic_mode(self):
 		self.__file.seek(self.__file.tell() - 1)
 
 	def nex_token(self):
@@ -163,7 +163,7 @@ class Lexer(object):
 					#self.pointer_file()
 					self.n_column = self.n_column - 1
 					print >>sys.stderr, "   ", "File ", self.__file.name, " \n\n\tLinha:", self.n_linha , " Coluna: ", self.n_column, "\n\t invalid", "\n\n\t expected ="
-					self.mode_panic()
+					self.panic_mode()
 
   			elif self.__estado == 31: # CASE 31
   				if self.c.isdigit():
