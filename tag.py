@@ -31,7 +31,7 @@ class Tag_Type(object):
     ID = 'ID'
 
     # Literal
-    LIT = "LIT"
+    LITERAL = "LITERAL"
 
     # Constante Numerica
     CON_NUM = "CON_NUM"

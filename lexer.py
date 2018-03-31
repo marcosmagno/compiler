@@ -19,7 +19,7 @@ class Lexer(object):
 		self.lexema = []
 		self.__list_digit = []
 		self.digit = []
-
+		self.__list_const_char = []
 		try:
 			self.__file = open(input_file,'r')
 		except IOError as e:
@@ -31,6 +31,7 @@ class Lexer(object):
 
 	def nex_token(self):
 
+		self.count_literal = 0
 		while True:
 
 			self.n_column = self.n_column + 1 
@@ -85,7 +86,7 @@ class Lexer(object):
 				
 				elif self.c == "}":
 					self.__estado = 1 # estado 26
-					return Token(Tag_Type.SMB_CBC, "{", self.n_linha, self.n_column)					
+					return Token(Tag_Type.SMB_CBC, "}", self.n_linha, self.n_column)					
 				
 				elif self.c == "(":
 					self.__estado = 1 # estado 27
@@ -110,7 +111,11 @@ class Lexer(object):
 
 				elif self.c.isalpha():					
 					self.__list_lexema.append(self.c)					
-					self.__estado = 14
+					self.__estado = 35
+
+				elif self.c == "'":
+					self.__estado = 40
+
 	
 
 			elif self.__estado == 2: # CASE 2
@@ -152,15 +157,36 @@ class Lexer(object):
 					print "Token Incompleto" #implemntar mensagem de error
 					return None
 
-	
+  			elif self.__estado == 31: # CASE 31
+  				if self.c.isdigit():
+  					self.__list_digit.append(self.c)
+  				else:
+  					if self.c == ".":
+  						self.__list_digit.append(self.c)
+  						self.__estado = 32 # estado 32
+  					else:
+	  					self.__estado = 1
+	  					self.digit = self.__list_digit
+	  					self.__list_digit = []
+	  					self.pointer_file()
+	  					return Token(Tag_Type.INTEGER, ''.join(map(str, self.digit)), self.n_linha, self.n_column)
 
+  			elif self.__estado == 32:  # CASE 31
+  				if self.c.isdigit():
+  					self.__list_digit.append(self.c)
+  					
+  				else:
+  					self.__estado = 1	# estado 34
+  					self.pointer_file()
+  					return Token(Tag_Type.DOUBLE, ''.join(map(str, self.__list_digit)), self.n_linha, self.n_column)
+  			
 
-  			elif self.__estado == 14: # Case 2
+  			elif self.__estado == 35: # Case 35
   				if self.c.isalpha() or self.c.isdigit(): 
   					self.__list_lexema.append(self.c)
 
   				else:
-  					self.__estado = 1 # Retorna para o comeco
+  					self.__estado = 1 # # estado 36
   					self.lexema = self.__list_lexema
   					self.__list_lexema = []
   					
@@ -171,35 +197,24 @@ class Lexer(object):
   						# se nao encontrar na tabela de simbolo, insere.
   						token = Token(Tag_Type.ID, ''.join(map(str, self.lexema)), self.n_linha, self.n_column)
 	  					self.__TS.put_tabela_simbolo(token, randint(21,100))
-	  					return token # retorna o novo token
-  					
+	  					return token # retorna o novo token  					
   					return token
 
-  			elif self.__estado == 31:
-  				if self.c.isdigit():
-  					self.__list_digit.append(self.c)
+  			elif self.__estado == 40:
+  				if self.c.isdigit() or self.c.isalpha() and self.c != "'":
+  					self.__list_const_char.append(self.c)  					
   				else:
-  					if self.c == ".":
-  						self.__list_digit.append(self.c)
-  						self.__estado = 32
-  					else:
-	  					self.__estado = 1
-	  					self.digit = self.__list_digit
-	  					self.__list_digit = []
-	  					self.pointer_file()
-	  					return Token(Tag_Type.INTEGER, ''.join(map(str, self.digit)), self.n_linha, self.n_column)
+  					if self.c == "'":
+  						self.__estado = 1
+  						if len(self.__list_const_char) > 1:
+  							print "Erro para formar a Constante Char"
+  							return None
+  						else:
+  							return Token(Tag_Type.CON_CHAR, ''.join(map(str, self.__list_const_char)), self.n_linha, self.n_column)
+  					
+	  					
+	  			#time.sleep(1)
 
-  			elif self.__estado == 32:
-  				if self.c.isdigit():
-  					self.__list_digit.append(self.c)
-  					
-  				else:
-  					self.__estado = 1
-  					self.pointer_file()
-  					return Token(Tag_Type.DOUBLE, ''.join(map(str, self.__list_digit)), self.n_linha, self.n_column)
-  					
-  					
-  				
 
 
 
