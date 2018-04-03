@@ -1,6 +1,7 @@
 from token import Token
 from tag import Tag_Type
 from random import *
+import sys
 class TabelaSimbolo(object):
 	"""docstring for TabelaSimbolo"""
 	def __init__(self):
@@ -67,6 +68,9 @@ class TabelaSimbolo(object):
 	def toString(self,value):
 		return str(value[0]) + "," + " '" + str(value[1]) + "'"
 
+	def get_ts(self):
+		for k,v in self.tabela_simbolo.iteritems():
+			print >> sys.stderr, k,v
 '''
 def main():
 	t = TabelaSimbolo()

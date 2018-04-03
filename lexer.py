@@ -4,6 +4,7 @@ from tabela_simbolo import TabelaSimbolo
 from token import Token
 from tag import Tag_Type
 from random import *
+import string
 class Lexer(object):
 	"""
 		This class implements the lexical analyzer.
@@ -19,6 +20,8 @@ class Lexer(object):
 		self.__list_digit = []
 		self.digit = []
 		self.__list_const_char = []
+		self.__list_literal = []
+		self.__list_double = []
 
 		# open the file
 		try:
@@ -49,6 +52,9 @@ class Lexer(object):
 			self.__file.seek(self.__file.tell() - 1)
 		except Exception as e:
 			raise e
+
+	def close_file(self):
+		self.__file.close()
 		
 
 	def nex_token(self):
@@ -60,7 +66,7 @@ class Lexer(object):
 			Alter state
 			
 		'''
-		self.count_literal = 0
+		
 		while True:
 
 			self.column = self.column + 1 
@@ -78,74 +84,76 @@ class Lexer(object):
 				if not self.c:					
 					return Token(Tag_Type.EOF, "EOF", self.row, self.column)				
 				
-				elif self.c == "\n":
-					self.row = self.row + 1
-					self.column = 1
+				elif self.c == "\n": # state 1
+					self.row = self.row + 1 # increase the line
+					self.column = 1 # returns the column count
 					pass
 
-				elif self.c == '\t':
+				elif self.c == '\t': # state 1
 					pass
 
-				elif self.c == " ":					 
+				elif self.c == " ":	 # state 1				 
 					pass
 
 				elif self.c == "<":
-					self.__state = 2
+					self.__state = 2 # state 2 return of the state 3 or 4
 
 				elif self.c == "=":
-					 self.__state = 5
+					 self.__state = 5 # state 5 return of the state 6 or 7
 
 				elif self.c == ">":
-					self.__state = 8
-
+					self.__state = 8 # state 8 return of the state 9 or 10
+ 
 				elif self.c == "!":
-					self.__state = 11
+					self.__state = 11 # state 11 return of the 11
 
 				elif self.c == "-": 
-					self.__state = 1 # estado 13
-					return Token(Tag_Type.OP_MIN, "-", self.row, self.column)
+					self.__state = 1 # state 13
+					return Token(Tag_Type.OP_MIN, "-", self.row, self.column) # return of the state 13
 
 				elif self.c == "+":
-					self.__state = 1 # estado 14
-					return Token(Tag_Type.OP_AD, "+", self.row, self.column)
+					self.__state = 1 # state 14
+					return Token(Tag_Type.OP_AD, "+", self.row, self.column) # return of the state 14
 
 				elif self.c == "{":
-					self.__state = 1 # estado 25
-					return Token(Tag_Type.SMB_OBC, "{", self.row, self.column)					
+					self.__state = 1 # state 25
+					return Token(Tag_Type.SMB_OBC, "{", self.row, self.column) # return of the state 25
 				
 				elif self.c == "}":
-					self.__state = 1 # estado 26
-					return Token(Tag_Type.SMB_CBC, "}", self.row, self.column)					
+					self.__state = 1 # state 26
+					return Token(Tag_Type.SMB_CBC, "}", self.row, self.column) # return of the state 26
 				
 				elif self.c == "(":
-					self.__state = 1 # estado 27
-					return Token(Tag_Type.SMB_OPA, "(", self.row, self.column)	
+					self.__state = 1 # state 27
+					return Token(Tag_Type.SMB_OPA, "(", self.row, self.column)	# return of the state 27
 
 				elif self.c == ")":
-					self.__state = 1 # estado 28
-					return Token(Tag_Type.SMB_CPA, ")", self.row, self.column)					
+					self.__state = 1 # state 28
+					return Token(Tag_Type.SMB_CPA, ")", self.row, self.column) # return of the state 28
 				
 				elif self.c == ",":
-					self.__state = 1 # estado 29
-					return Token(Tag_Type.SMB_COM, ",", self.row, self.column)					
+					self.__state = 1 # state 29
+					return Token(Tag_Type.SMB_COM, ",", self.row, self.column) # return of the state 29				
 
 				elif self.c == ";":
-					self.__state = 1 # estado 30
-					return Token(Tag_Type.SMB_SEM, ";", self.row, self.column)					
+					self.__state = 1 # state 30
+					return Token(Tag_Type.SMB_SEM, ";", self.row, self.column) # return of the state 30			
 			
-
+				# build num_const
 				elif self.c.isdigit():
-					self.__list_digit.append(self.c)
+					self.__list_digit.append(self.c) # return of the state 34
 					self.__state = 31
 
+				# build id
 				elif self.c.isalpha():					
-					self.__list_lexema.append(self.c)					
+					self.__list_lexema.append(self.c) # return of the state 36 ( install ID)
 					self.__state = 35
 
 				elif self.c == "'":
-					self.__state = 40
+					self.__state = 40 # return of the state 42 ( return a char_const )
 
-	
+				elif self.c == "\"":
+					self.__state = 37
 
 			elif self.__state == 2: # CASE 2
 				if self.c == "=":
@@ -160,11 +168,11 @@ class Lexer(object):
 
 
 			elif self.__state == 5: # CASE 5
-				if self.c == "=": # estado 6
+				if self.c == "=": # state 6
 				   self.__state = 1
 				   return Token(Tag_Type.OP_EQ, "==", self.row, self.column)					
 				else:
-					self.__state = 1 # estado 7
+					self.__state = 1 # state 7
 					self.file_pointer()
 					self.column = self.column - 1
 					return Token(Tag_Type.OP_ASS, "=", self.row, self.column)					
@@ -172,32 +180,36 @@ class Lexer(object):
 			
 			elif self.__state == 8: # CASE 8
 				if self.c == "=":
-					self.__state = 1 # estado 9
+					self.__state = 1 # state 9
 					return Token(Tag_Type.OP_ASS, "=", self.row, self.column)	
 				else:
-					self.__state = 1 # estado 10
+					self.__state = 1 # state 10
 					self.file_pointer()
 					self.column = self.column - 1
 					return Token(Tag_Type.OP_GT, "=", self.row, self.column)					
 
 			elif self.__state == 11: # CASE 11
 				if self.c == "=":
-					self.__state = 1 # estado 12
+					self.__state = 1 # state 12
 					return Token(Tag_Type.OP_NE, "!=", self.row, self.column)
 				else:
-					self.__state = 1 # estado 13
+					self.__state = 1 # state 13
 					#self.file_pointer()
 					self.column = self.column - 1
 					print >>sys.stderr, "   ", "File ", self.__file.name, " \n\n\tLinha:", self.row , " Coluna: ", self.column, "\n\t invalid", "\n\n\t expected ="
-					self.panic_mode()
+					#self.panic_mode()
 
   			elif self.__state == 31: # CASE 31
   				if self.c.isdigit():
   					self.__list_digit.append(self.c)
+  					self.__state = 31
+
   				else:
   					if self.c == ".":
+  						#print self.__state   						
   						self.__list_digit.append(self.c)
-  						self.__state = 32 # estado 32
+  						self.__state = 32 # state 32
+
   					else:
 	  					self.__state = 1
 	  					self.digit = self.__list_digit
@@ -207,14 +219,25 @@ class Lexer(object):
 	  					return Token(Tag_Type.INTEGER, ''.join(map(str, self.digit)), self.row, self.column)
 
   			elif self.__state == 32:  # CASE 31
+		
   				if self.c.isdigit():
-  					self.__list_digit.append(self.c)
-  					
+  					self.__list_double.append(self.c)
+  					self.__state = 32  
+
   				else:
-  					self.__state = 1	# estado 34
-  					self.file_pointer()
-  					self.column = self.column - 1
-  					return Token(Tag_Type.DOUBLE, ''.join(map(str, self.__list_digit)), self.row, self.column)
+  					if not self.c.isdigit():
+  						if len(self.__list_double) >= 1:
+
+  							self.__state = 1	# state 34
+  							#self.file_pointer()
+  							#self.column = self.column - 1
+  							return Token(Tag_Type.DOUBLE, ''.join(map(str, self.__list_digit + self.__list_double)), self.row, self.column)
+  						else:
+  							self.panic_mode()
+  							self.__state = 1
+  					else:
+  						self.panic_mode()
+  						self.__state = 1
   			
 
   			elif self.__state == 35: # Case 35
@@ -222,20 +245,37 @@ class Lexer(object):
   					self.__list_lexema.append(self.c)
 
   				else:
-  					self.__state = 1 # # estado 36
+  					self.__state = 1 # # state 36
   					self.lexema = self.__list_lexema
   					self.__list_lexema = []
   					
 
-  					token =  self.__TS.get_token(''.join(map(str, self.lexema))) # Pesquisa na Tabela de Simbolo
+  					token =  self.__TS.get_token(''.join(map(str, self.lexema))) # Pesquisa na Tabela de Simbolo.
   					self.file_pointer()
   					self.column = self.column - 1
   					if token == None: 
-  						# se nao encontrar na tabela de simbolo, insere.
+  						# if not found in the symbol table, insert.
   						token = Token(Tag_Type.ID, ''.join(map(str, self.lexema)), self.row, self.column)
-	  					self.__TS.put_tabela_simbolo(token, randint(21,100)) # Cadastra na Tabela de Simbolo
-	  					return token # retorna o novo token  					
+	  					self.__TS.put_tabela_simbolo(token, randint(21,100)) # insert in the symbol table.
+	  					return token # returns a new token object.  					
   					return token
+
+  			elif self.__state == 37:  		
+  					
+  				if self.c in string.whitespace or self.c in string.letters:
+  					self.__list_literal.append(self.c)
+  					self.__state = 37	  					
+  					#time.sleep(2)  				
+  				else:
+  					if self.c == "\"":
+  						self.__state = 1
+  						#print "lskjdfksa"
+  						return Token(Tag_Type.LITERAL, ''.join(map(str, self.__list_digit)), self.row, self.column)
+  					else:
+  						#print "error"
+  						self.panic_mode()
+  						self.__state = 1
+
 
   			elif self.__state == 40:
   				if self.c.isdigit() or self.c.isalpha() and self.c != "'":
@@ -245,26 +285,22 @@ class Lexer(object):
   						self.__state = 1
   						if len(self.__list_const_char) > 1:
   							print "Erro para formar a Constante Char"
-  							return None
+  							
   						else:
   							return Token(Tag_Type.CON_CHAR, ''.join(map(str, self.__list_const_char)), self.row, self.column)
   					
-
-
-
-
 
 def main():
 	lexer = Lexer('HelloJavinha.jvn')
 	while True:
 		token = lexer.nex_token()
-		if token == None:
-			return
-		if token.getLexema() == "EOF":
+		if (token == None) or (token.getLexema() == "EOF"):
+			lexer.close_file()
 			return
 		else:
 			print >>sys.stderr, "Token: " + " '"+ str(token.toString()) +"' " + " Linha: " + str(lexer.row) + " Coluna: " + str(lexer.column)
-
+			#ts = TabelaSimbolo()
+			#ts.get_ts()
 
 if __name__ == '__main__':
 	main()
