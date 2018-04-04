@@ -24,6 +24,7 @@ class Lexer(object):
 		self.__list_double = []
 		self.double = []
 		self._result_double = []
+		self.erros = []
 
 
 		# open the file
@@ -54,11 +55,16 @@ class Lexer(object):
 		self.row_ = row
 		self.column_ = column
 		self.type_erro = type_erro
-		self.erros = []
+		
 		self.command = ''
 
 		self.command = ''.join(map(str, str(self.type_erro) + " Linha: " + str(self.row_) + " Coluna: " + str(self.column_)))
-		print self.command
+		self.erros.append(self.command)
+
+	def get_erros(self):
+
+		for i in self.erros:
+			print i
 
 		
 
@@ -151,6 +157,12 @@ class Lexer(object):
 			
 				elif self.c == "/":
 					self.__state = 16
+				
+				elif self.c == "*":
+					self.__state = 15
+
+		
+
 
 				# build num_const
 				elif self.c.isdigit():
@@ -181,7 +193,14 @@ class Lexer(object):
 					self.column = self.column - 1
 					return Token(Tag_Type.OP_LT, "<", self.row, self.column)
 
-
+			elif self.__state == 15:
+				if self.c == "/":
+					print "barra"
+				else:
+					self.file_pointer()
+					self.__state = 1
+					print "mult"
+			
 			elif self.__state == 5: # CASE 5
 				if self.c == "=": # state 6
 				   self.__state = 1
@@ -228,21 +247,20 @@ class Lexer(object):
 			
 
 			elif self.__state == 17:
-
+				print "erro fim do arquivo"
 				if self.c != "*":
 					self.__state = 17
 				else:	
 					self.__state = 19					
 
 			elif self.__state == 19:
-
 				if self.c == "/":
 					self.__state = 1
 					pass
-
-
 				else:
 					self.__state = 17
+
+
 
 
 
@@ -359,17 +377,22 @@ class Lexer(object):
   					
 
 def main():
-	#print "Symbol Tablessssssssssssss"
-	#ts = TabelaSimbolo()
-	#ts.get_ts()
+
 	lexer = Lexer('erro_cassio.psc')
-	while True:
+	var = True
+	while var:		
 		token = lexer.nex_token()
-		if (token == None) or (token.getLexema() == "EOF"):
+		if (token == None) or (token.getLexema() == "EOF"):			
 			lexer.close_file()
-			return
+			var = False
 		else:
 			print >>sys.stderr, "Token: " + " '"+ str(token.toString()) +"' " + " Linha: " + str(lexer.row) + " Coluna: " + str(lexer.column)
+	print "\n\nErros"
+	lexer.get_erros()
+
+	print "\n\nSymbol Table"
+	ts = TabelaSimbolo()
+	ts.get_ts()
 
 
 if __name__ == '__main__':
