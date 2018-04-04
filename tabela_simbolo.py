@@ -13,12 +13,13 @@ class TabelaSimbolo(object):
 	
 		self.put_tabela_simbolo(self.word, randint(0,20) )
 
-		
+		self.word = Token(Tag_Type.KW, 'else', 0, 0)
+		self.put_tabela_simbolo(self.word, randint(0,20) )
+
 		self.word = Token(Tag_Type.KW, 'if', 0, 0)
 		self.put_tabela_simbolo(self.word, randint(0,20) )
 
-		self.word = Token(Tag_Type.KW, 'else', 0, 0)
-		self.put_tabela_simbolo(self.word, randint(0,20) )
+
 
 		self.word = Token(Tag_Type.KW, 'while', 0, 0)
 		self.put_tabela_simbolo(self.word, randint(0,20) )
@@ -57,8 +58,9 @@ class TabelaSimbolo(object):
 		self.tabela_simbolo[i] = w
 
 
+
 	def get_token(self, lexema):
-		
+
 		for k, token in self.tabela_simbolo.iteritems():
 			if token.getLexema() == lexema:
 				return token
@@ -70,7 +72,7 @@ class TabelaSimbolo(object):
 
 	def get_ts(self):
 		for k,v in self.tabela_simbolo.iteritems():
-			print >> sys.stderr, k,v
+			print >>sys.stderr, k,v.toString()
 '''
 def main():
 	t = TabelaSimbolo()
