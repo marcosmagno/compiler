@@ -16,15 +16,9 @@ class Lexer(object):
 		self.column = 1
 		self.__state = 1 #
 		self.__list_lexema = []
-		self.lexema = []
-		self.__list_digit = []
-		self.digit = []
-		self.__list_const_char = []
-		self.__list_literal = []
-		self.__list_double = []
-		self.double = []
-		self._result_double = []
 		self.erros = []
+		self.EOF = 1
+		self.char = ''
 
 
 		# open the file
@@ -82,21 +76,23 @@ class Lexer(object):
 			Alter state
 			
 		'''
-		
+		self.__list_lexema = []
 		while True:
-
+			
 			self.column = self.column + 1 
 
 			# Read File
 			try:
 				self.c = self.__file.read(1)				
 				if not self.c:
-					return Token(Tag_Type.EOF, "EOF", self.row, self.column)				
+					self.EOF = -1
+					#return Token(Tag_Type.EOF, "EOF", self.row, self.column)				
 
 			except IOError as e:
 				raise e		
 
 			if self.__state == 1: # CASE 1
+
 				if not self.c:			
 					return Token(Tag_Type.EOF, "EOF", self.row, self.column)				
 				
@@ -161,12 +157,9 @@ class Lexer(object):
 				elif self.c == "*":
 					self.__state = 15
 
-		
-
-
 				# build num_const
 				elif self.c.isdigit():
-					self.__list_digit.append(self.c) # return of the state 34
+					self.__list_lexema.append(self.c) # return of the state 34
 					self.__state = 31
 
 				# build id
@@ -181,6 +174,7 @@ class Lexer(object):
 					self.__state = 37
 
 				else:
+
 					self.panic_mode(self.row, self.column, "Invalid Character")
 
 			elif self.__state == 2: # CASE 2
@@ -199,7 +193,7 @@ class Lexer(object):
 				else:
 					self.file_pointer()
 					self.__state = 1
-					print "mult"
+					return Token(Tag_Type.OP_MUL, "*", self.row, self.column)
 			
 			elif self.__state == 5: # CASE 5
 				if self.c == "=": # state 6
@@ -243,13 +237,15 @@ class Lexer(object):
 				else:
 					self.__state = 1
 					self.file_pointer()
-					return Token(Tag_Type.OP_DIV, ''.join(map(str, self.__list_digit + self.__list_double)), self.row, self.column)
+					return Token(Tag_Type.OP_DIV, "/", self.row, self.column)
 			
 
-			elif self.__state == 17:
-				print "erro fim do arquivo"
+			elif self.__state == 17:				
 				if self.c != "*":
 					self.__state = 17
+					if self.EOF == -1:
+  						self.panic_mode(self.row, self.column,"Invalid Character expected */""")
+  						return None					
 				else:	
 					self.__state = 19					
 
@@ -258,13 +254,11 @@ class Lexer(object):
 					self.__state = 1
 					pass
 				else:
-					self.__state = 17
-
-
-
-
-
-
+					if self.EOF == -1:
+  						self.panic_mode(self.row, self.column,"Invalid Character expected */""")
+  						return None
+  					else:					
+						self.__state = 17
 
 			elif self.__state == 21:
 				if self.c == " " or self.c == "\t" or self.c in string.letters or self.c.isdigit():
@@ -273,112 +267,85 @@ class Lexer(object):
 					self.__state = 1
 					self.file_pointer()
 					pass
-					#return Token(Tag_Type.COMENTARIO_UMALINHA, ''.join(map(str, self.__list_digit + self.__list_double)), self.row, self.column)
+					
 
   			elif self.__state == 31: # CASE 31
+
   				if self.c.isdigit():
-  					self.__list_digit.append(self.c)
+  					self.__list_lexema.append(self.c)
   					self.__state = 31
-
-
-
   				else:
   					if self.c == ".": 						
-  						self.__list_digit.append(self.c)
-  						self.__list_double = self.__list_digit
-  						self.__list_digit = []
+  						self.__list_lexema.append(self.c)
   						self.__state = 32 # state 32
-
-
   					else:
 	  					self.__state = 1
-	  					self.digit = self.__list_digit
-	  					self.__list_digit = []
-
 	  					self.file_pointer()
 	  					self.column = self.column - 1
-	  					return Token(Tag_Type.INTEGER, ''.join(map(str, self.digit)), self.row, self.column)
+	  					return Token(Tag_Type.CON_NUM, ''.join(map(str, self.__list_lexema)), self.row, self.column)
 
   			elif self.__state == 32:  # CASE 31	
   				if self.c.isdigit():
-  					self.double.append(self.c)
-
+  					self.__list_lexema.append(self.c)
   					self.__state = 32  
 
-
   				else:
-  					if not self.c.isdigit():
-  						if len(self.double) >= 1:
-  							self.__state = 1	# state 34
-  							self.file_pointer()  							
-  							self._result_double = self.__list_double + self.double
-  							self.digit = self.__list_digit
-  							self.__list_double = []
-  							self.__list_digit = []
-  							self.double = []
-  							return Token(Tag_Type.DOUBLE, ''.join(map(str, self._result_double)), self.row, self.column)
-  						else:
-  							self.__list_double = []
-  							self.__list_digit = []
-  							self.double = []
-  							self.file_pointer()
-  							self.panic_mode(self.row, self.column, "Invalid Character, expected a integer")
-							self.__state = 1
+  					self.__state = 1	# state 34
+  					self.file_pointer()
+  					return Token(Tag_Type.CON_NUM, ''.join(map(str, self.__list_lexema)), self.row, self.column)
+  					#else:  	
+  					#		self.panic_mode(self.row, self.column, "Invalid Character, expected a integer")
+					#		self.__state = 1
   					
 
   			elif self.__state == 35: # Case 35
   				if self.c.isalpha() or self.c.isdigit(): 
   					self.__list_lexema.append(self.c)
-
+  					
   				else:
-  					self.__state = 1 # # state 36
-  					self.lexema = self.__list_lexema
-  					self.__list_lexema = []
-
-  					token =  self.__TS.get_token(''.join(map(str, self.lexema))) # Pesquisa na Tabela de Simbolo.
-  					self.file_pointer()
+  					self.__state = 1 # state 36
+  					token =  self.__TS.get_token(''.join(map(str, self.__list_lexema))) # Pesquisa na Tabela de Simbolo.
   					self.column = self.column - 1
 
   					if token == None:
+  						self.file_pointer()
   						# if not found in the symbol table, insert.
-  						token = Token(Tag_Type.ID, ''.join(map(str, self.lexema)), self.row, self.column)
-
+  						token = Token(Tag_Type.ID, ''.join(map(str, self.__list_lexema)), self.row, self.column)
 	  					self.__TS.put_tabela_simbolo(token, randint(21,100)) # insert in the symbol table.
 	  					return token # returns a new token object.  					
   					return token
 
-  			elif self.__state == 37:  		
-  					
-  				if self.c in string.whitespace or self.c in string.letters:
-  					self.__list_literal.append(self.c)
+  			elif self.__state == 37:
+  				if self.c in string.whitespace or self.c in string.letters or self.c.isdigit():
+  					self.__list_lexema.append(self.c)
   					self.__state = 37	  					
-  					#time.sleep(2)  				
+  					
+  				if self.c == "\"":
+  						self.__state = 1
+ 						return Token(Tag_Type.LITERAL, ''.join(map(str, self.__list_lexema)), self.row, self.column)
   				else:
-  					if self.c == "\"":
-  						self.__state = 1
-  						return Token(Tag_Type.LITERAL, ''.join(map(str, self.__list_literal)), self.row, self.column)
-  					else:
+  					if self.EOF == -1:
   						self.panic_mode(self.row, self.column,"Invalid Character expected \"")
-  						#sprint >>sys.stderr, "   ", "File ", self.__file.name, " \n\n\tLinha:", self.row , " Coluna: ", self.column - 1, "\n\t invalid", "\n\t expected ""\"" "\n"
-  						self.file_pointer()
-  						self.__state = 1
-
+  						return None
+  					
 
   			elif self.__state == 40:
   				if self.c.isdigit() or self.c.isalpha() and self.c != "'":
-  					self.__list_const_char.append(self.c)  					
+  					self.__list_lexema.append(self.c) 
+  					self.__state = 40
   				else:
+
   					if self.c == "'":
   						self.__state = 1
-  						if len(self.__list_const_char) > 1:
-  							print >>sys.stderr, "   ", "File ", self.__file.name, " \n\n\tLinha:", self.row , " Coluna: ", self.column - 1, "\n\t invalid", "\n\t literal must contain only one character\n"  							
+  						if len(self.__list_lexema) > 1:
+  							self.panic_mode(self.row, self.column,"literal must contain only one character \"")
+
 						else:
-  							return Token(Tag_Type.CON_CHAR, ''.join(map(str, self.__list_const_char)), self.row, self.column)
-  					
+  							return Token(Tag_Type.CON_CHAR, ''.join(map(str, self.__list_lexema)) , self.row, self.column)
 
 def main():
 
-	lexer = Lexer('erro_cassio.psc')
+	lexer = Lexer('teste2.txt')
 	var = True
 	while var:		
 		token = lexer.nex_token()

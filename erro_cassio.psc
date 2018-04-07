@@ -1,9 +1,6 @@
-marcos__carvalho
-"m@rcos"
-if a ! b
+int i = 10
 
-10 * 20
-10 / 39
-/*marcosmagbod lskjdfa asldsj 888slsd 
+'m' program {""} program
 
-p=10
+/* marcos * taciana  biancf */
+10 - 20 

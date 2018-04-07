@@ -1,0 +1,16 @@
+progrm teste1{
+int a = 2;
+if( a < 5){
+valor = 'b';
+valor2 = "copiladores";
+valor1 = 5;		
+}else{
+int valor3 = true;
+}
+valor1 = 3 + 2;
+while( valor1 != 10){
+valor1 = valo1 + valor1;
+}
+if(valor1 >= 3){
+}
+}

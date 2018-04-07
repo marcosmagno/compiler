@@ -1,0 +1,21 @@
+program teste3{
+	;
+	valor;
+	VALOR = 6 + 3;
+	VAlor = VALOr / 2;
+	valor = 1.55;
+	if(valor < 2 && valor > 50){
+	}else{
+		valor1 = 5-3-4+8+2/4+3.55,00 // teste 'asjdha'
+	}
+	while(){
+		/* esperessadaksudaskjdl
+		skdjflkdfjskdf			
+		3546446	
+		*/-+*-
+		/*
+		
+		valor3 = " ates2434 ";
+
+	}
+}
