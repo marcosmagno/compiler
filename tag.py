@@ -1,4 +1,5 @@
-class Tag_Type(object):
+class Tag_type(object):
+    """docstring for Token"""
     # Operadores
     OP_EQ = 'OP_EQ'
     OP_NE = 'OP_NE'
@@ -31,7 +32,7 @@ class Tag_Type(object):
     ID = 'ID'
 
     # Literal
-    LITERAL = "LITERAL"
+    LIT = "LIT"
 
     # Constante Numerica
     CON_NUM = "CON_NUM"
@@ -39,9 +40,6 @@ class Tag_Type(object):
     # Constante Char
     CON_CHAR = "CON_CHAR"
 
-    # Digit
-    INTEGER = "INTEGER"
-    DOUBLE = "DOUBLE"
 
     # Comentario
 

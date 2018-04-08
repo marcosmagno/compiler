@@ -1,0 +1,15 @@
+program teste5{
+	valor == 5,
+	valor < 5;
+	valor = 		23;
+	valor1 = "teste";
+	if(valor1 == valor){
+	}else{
+			
+	}else if(valor1 != ' teste'){
+
+	else(valor == 'a'){
+		
+	}
+
+}
