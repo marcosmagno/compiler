@@ -1,16 +1,18 @@
-progrm teste1{
-int a = 2;
-if( a < 5){
-valor = 'b';
-valor2 = "copiladores";
-valor1 = 5;		
-}else{
-int valor3 = true;
-}
-valor1 = 3 + 2;
-while( valor1 != 10){
-valor1 = valo1 + valor1;
-}
-if(valor1 >= 3){
-}
-}
+program verificaMode{
+	destino = "150.777.22.1"
+	char mode = "allocate";
+	num node = 0;
+	link = "google.com.br"
+	
+	
+
+	if mode == "allocate" {
+		write "Alocando...."
+		node = node + 1;
+		write link;
+		write destino;
+	} else {
+		write "Error"
+
+	}
+	

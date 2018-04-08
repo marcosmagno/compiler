@@ -8,8 +8,11 @@ class Token(object):
 
 	def getLexema(self):
 		return self.lexema
+		
+	def getClasse(self):
+		return self.classe
 
 	def toString(self):
-		return "< " + str(self.classe) +  ", " + str(self.lexema)
+		return "< " + str(self.classe) +  ", " + "\""  + str(self.lexema) + "\""
 		
 

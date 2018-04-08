@@ -1,0 +1,16 @@
+program teste6{
+	VALOR = 6;
+	VALOR1 = 'A';
+	VALOR2 = "LKSDFJAIO4655";
+	IF( VALor << 9 | valor1 != "sdasdadaj"){
+		whil e(){
+			//calcular testar	
+				seguir ok */
+		};
+	}
+	if(valor == /*+){
+		
+	}
+	valor1 = valor1 - 6;
+
+}
