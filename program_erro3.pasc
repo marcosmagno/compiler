@@ -1,0 +1,29 @@
+program erro2{
+	valor = 5;
+	if (valor < 5) {
+		valor = 10 * 5;
+		valor = 10.o;
+
+	} else {
+		valor = 5;
+	}
+	
+	while(valor > 5) {
+	/* vamos testar o comentario de varias linhas.
+		para ver se funciona mesmo */
+	}
+
+	user = 'marcos'
+	
+	if(user == "marcos"){
+	write "Marcos"
+	}else{
+		/* inicia o teste dos comentarios de varias linhas
+			na qual deve-se ignorar ate o fim de arquivo
+	}else if(valor1 != ' teste'){
+
+	else(valor == 'a'){
+		
+	}
+
+}

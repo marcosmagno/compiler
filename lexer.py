@@ -6,7 +6,7 @@ from tag import Tag_type
 from random import *
 import string
 
-__author__ = "seu nome"
+__author__ = "Marcos Magno de Carvalho"
 class Lexer(object):
 	"""This class implements the lexical analyzer"""
 
@@ -180,7 +180,7 @@ class Lexer(object):
 				else:
 					self.__state = 1
 					self.file_pointer()
-					self.column = self.column - 1
+					#self.column = self.column - 1
 					return Token(Tag_type.OP_LT, "<", self.row, self.column)
 
 			elif self.__state == 15:
@@ -220,6 +220,12 @@ class Lexer(object):
 					if self.EOF == -1:
 						return None
 					else:
+						if self.c == "\n":
+							self.row = self.row + 1
+							self.column = 1
+						if self.c == "\t":
+							self.column = self.column + 3
+
 						self.__state = 11		
 						self.panic_mode(self.row, self.column, "Invalid Character, expected =")
 
@@ -239,6 +245,11 @@ class Lexer(object):
 			elif self.__state == 17:				
 				if self.c != "*":
 					self.__state = 17 # state 18
+					if self.c == "\n":
+						self.row = self.row + 1
+						self.column = 1
+					if self.c == "\t":
+						self.column = self.column + 3
 					if self.EOF == -1:
   						self.panic_mode(self.row, self.column,"Invalid Character expected */""")
   						return None					
@@ -260,9 +271,12 @@ class Lexer(object):
 				if self.c == " " or self.c == "\t" or self.c in string.letters or self.c.isdigit():
 					self.__state = 21
 				else:
-					self.__state = 1
-					self.file_pointer()
-					pass
+					if self.c == "\n":
+						self.__state = 1
+						self.file_pointer()
+						pass
+					else:
+						self.__state = 21
 					
 
   			elif self.__state == 31: # CASE 31
@@ -270,13 +284,13 @@ class Lexer(object):
   					self.__list_lexema.append(self.c)
   					self.__state = 31
   				else:
-  					if self.c == ".": 		
-  						print "aui"				
+  					if self.c == ".":  					
   						self.__list_lexema.append(self.c)
   						self.__state = 32 # state 32
   					else:
 	  					self.__state = 1	
 	  					self.file_pointer()
+	  					self.column = self.column - 1
 	  					return Token(Tag_type.CON_NUM, ''.join(map(str, self.__list_lexema)), self.row, self.column)
 
   			elif self.__state == 32 :  # CASE 31
@@ -288,6 +302,11 @@ class Lexer(object):
   						self.panic_mode(self.row, self.column, "Error encountered. Expected an integer ")
   						return None
   					else:
+  						if self.c == "\n":
+  							self.row = self.row + 1
+  							self.column = 1
+  						if self.c == "\t":
+  							self.column = self.column + 3
   						self.panic_mode(self.row, self.column, "Error encountered. Expected an integer ")
   						self.__state = 32
 		
@@ -297,10 +316,9 @@ class Lexer(object):
   					self.__list_lexema.append(self.c)
   				else:
   					self.__state = 1 # state 36
-  					token =  self.__TS.get_token(''.join(map(str, self.__list_lexema))) # Pesquisa na Tabela de Simbolo.
- 
+  					token =  self.__TS.get_token(''.join(map(str, self.__list_lexema))) # Pesquisa na Tabela de Simbolo. 
   					self.column = self.column - 1
-
+  					self.file_pointer()
   					if token == None:
   						# if not found in the symbol table, insert.
   						token = Token(Tag_type.ID, ''.join(map(str, self.__list_lexema)), self.row, self.column)
@@ -309,7 +327,8 @@ class Lexer(object):
 	  					if self.EOF == -1:
 	  						pass
 	  					else:
-	  						self.file_pointer()
+	  						#self.file_pointer()
+	  						pass
 	  					#return token # returns a new token object.  				
 	  				
   					return token
@@ -318,7 +337,7 @@ class Lexer(object):
   				#print self.c, self.__state
   				#time.sleep(1)
 
-  				if self.c == " " or self.c.isalpha() or self.c.isdigit():
+  				if self.c == " " or self.c.isalpha() or self.c.isdigit() :
   					self.__list_lexema.append(self.c)
   					self.__state = 37
  
@@ -343,14 +362,18 @@ class Lexer(object):
   					
 
   			elif self.__state == 40:
+
   				if self.c.isdigit() or self.c.isalpha() and self.c != "'":
   					self.__list_lexema.append(self.c) 
   					self.__state = 40
   				else:
+
   					if self.c == "'":
   						self.__state = 1
   						if len(self.__list_lexema) > 1:
-  							self.panic_mode(self.row, self.column,"literal must contain only one character \"")  							
+  							self.panic_mode(self.row, self.column,"literal must contain only one character")
+  							self.__list_lexema = [] 
+  							#print self.c							
 						else:
   							return Token(Tag_type.CON_CHAR, ''.join(map(str, self.__list_lexema)) , self.row, self.column)
   					if self.EOF == -1:
@@ -362,7 +385,7 @@ def main():
 	"""docstring for Token"""
 	ts = TabelaSimbolo()
 	
-	lexer = Lexer('teste1.txt', ts)
+	lexer = Lexer('program.pasc', ts)
 	var = True
 	while var:		
 		token = lexer.nex_token()

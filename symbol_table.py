@@ -13,8 +13,6 @@ class TabelaSimbolo(object):
 		self.tabela_simbolo = {}
 		#self.word = ["KW", 'program', 0 , 0]
 		self.word = Token(Tag_type.KW, 'program', 0, 0)
-#		print self.word.getLexema()
-	
 		self.put_symbol_table(self.word)
 
 		self.word = Token(Tag_type.KW, 'else', 0, 0)
@@ -49,11 +47,6 @@ class TabelaSimbolo(object):
 		self.word = Token(Tag_type.KW, 'and', 0, 0)
 		self.put_symbol_table(self.word)	
 
-		self.word = Token(Tag_type.KW, 'class', 0, 0)
-		self.put_symbol_table(self.word)
-
-		self.word = Token(Tag_type.KW, 'public', 0, 0)
-		self.put_symbol_table(self.word)	
 
 
 

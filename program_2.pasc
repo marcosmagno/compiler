@@ -1,0 +1,36 @@
+program pasCTeste{
+	/* Programa para testar a linguagem
+	PasC do professor de Compiladores.
+
+	Ressalto que essa funcao e apenas para testar
+	nada mais do que testar.*/
+
+
+	char logger = "start time: "
+	char parsed = rspec;
+	char var = True;
+	num list = 0 // Inicia a lista
+	if parsed == var {
+	logger = "start time: "
+	list = list + 1;
+
+	} else {
+		list = list - 1
+	}
+
+	while (list != -1) {
+		write "Analisando";
+
+	}
+
+	if(list>10){
+		while(parsed==var){ write "passando"} // Imprime 
+
+	}else{
+		num usrp = 100
+		if(usrp not list){
+			write "fim"
+		}
+	}
+
+}
