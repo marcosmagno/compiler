@@ -21,6 +21,7 @@ class Lexer(object):
         self.erros = []
         self.EOF = 1
         self.char = ''
+        print "sldfja"
 
         # open the file
         try:
