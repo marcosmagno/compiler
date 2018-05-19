@@ -12,8 +12,8 @@ __author__ = "Marcos Magno de Carvalho"
 class Lexer(object):
     """This class implements the lexical analyzer"""
 
-    def __init__(self, input_file, obj_ts):
-        self.__TS = obj_ts
+    def __init__(self, input_file):
+        self.__TS = TabelaSimbolo()
         self.row = 1
         self.column = 1
         self.__state = 1
@@ -402,28 +402,3 @@ class Lexer(object):
                                         "Invalid Character expected '""", "'", self.c)
                         return None
 
-
-def main():
-    """docstring for Token"""
-    ts = TabelaSimbolo()
-
-    lexer = Lexer('program_erro2.pasc', ts)
-    var = True
-    while var:
-        token = lexer.nex_token()
-        if (token == None) or (token.getLexema() == "EOF"):
-            lexer.close_file()
-            var = False
-        else:
-            print >>sys.stderr, "Token: " + \
-                str(token.toString()) + " Linha: " + \
-                str(lexer.row) + " Coluna: " + str(lexer.column)
-    print "\n\nErros"
-    lexer.get_erros()
-
-    print "\n\nSymbol Table"
-    ts.get_ts()
-
-
-if __name__ == '__main__':
-    main()
