@@ -12,39 +12,39 @@ class TabelaSimbolo(object):
 
 		self.tabela_simbolo = {}
 		#self.word = ["KW", 'program', 0 , 0]
-		self.word = Token(Tag_type.KW, 'program', 0, 0)
+		self.word = Token(Tag_type.KW_PROGRAM, 'program', 0, 0)
 		self.put_symbol_table(self.word)
 
-		self.word = Token(Tag_type.KW, 'else', 0, 0)
+		self.word = Token(Tag_type.KW_ELSE, 'else', 0, 0)
 		self.put_symbol_table(self.word)
 
-		self.word = Token(Tag_type.KW, 'if', 0, 0)
+		self.word = Token(Tag_type.KW_IF, 'if', 0, 0)
 		self.put_symbol_table(self.word)
 
 
-		self.word = Token(Tag_type.KW, 'while', 0, 0)
+		self.word = Token(Tag_type.KW_WHILE, 'while', 0, 0)
 		self.put_symbol_table(self.word)
 
-		self.word = Token(Tag_type.KW, 'write', 0, 0)
+		self.word = Token(Tag_type.KW_WRITE, 'write', 0, 0)
 		self.put_symbol_table(self.word)		
 
 
-		self.word = Token(Tag_type.KW, 'read', 0, 0)
+		self.word = Token(Tag_type.KW_READ, 'read', 0, 0)
 		self.put_symbol_table(self.word)	
 
-		self.word = Token(Tag_type.KW, 'num', 0, 0)
+		self.word = Token(Tag_type.KW_NUM, 'num', 0, 0)
 		self.put_symbol_table(self.word)
 
-		self.word = Token(Tag_type.KW, 'char', 0, 0)
+		self.word = Token(Tag_type.KW_CHAR, 'char', 0, 0)
 		self.put_symbol_table(self.word)	
 
-		self.word = Token(Tag_type.KW, 'not', 0, 0)
+		self.word = Token(Tag_type.KW_NOT, 'not', 0, 0)
 		self.put_symbol_table(self.word)				
 
-		self.word = Token(Tag_type.KW, 'or', 0, 0)
+		self.word = Token(Tag_type.KW_OR, 'or', 0, 0)
 		self.put_symbol_table(self.word)	
 
-		self.word = Token(Tag_type.KW, 'and', 0, 0)
+		self.word = Token(Tag_type.KW_AND, 'and', 0, 0)
 		self.put_symbol_table(self.word)	
 
 

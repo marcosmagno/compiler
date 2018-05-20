@@ -28,6 +28,12 @@ class Lexer(object):
         except IOError as e:
             print "Erro to open file."
 
+    def get_row(self):
+        return self.row
+
+    def get_column(self):
+        return self.column
+
     def file_pointer(self):
         """
                 this method handles the pointer in the file
@@ -313,7 +319,7 @@ class Lexer(object):
                 else:
                     if self.EOF == -1:
                         self.panic_mode(self.row, self.column,
-                                        "Error encountered. Expected an integer " ,"1", self.c) # tratar esse
+                                        "Error encountered. Expected an integer ", "1", self.c)  # tratar esse
                         return None
                     else:
                         if self.c == "\n":
@@ -364,7 +370,7 @@ class Lexer(object):
                     self.column = 1
                     self.__state = 37
                     self.panic_mode(self.row, self.column,
-                                    "Can not have line break :" " ", self.c) #tratar esse
+                                    "Can not have line break :" " ", self.c)  # tratar esse
 
                 elif self.c == "\"":
                     if len(self.__list_lexema) < 1:
@@ -401,4 +407,3 @@ class Lexer(object):
                         self.panic_mode(self.row, self.column,
                                         "Invalid Character expected '""", "'", self.c)
                         return None
-

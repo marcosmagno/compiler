@@ -407,7 +407,7 @@ def main():
     """docstring for Token"""
     ts = TabelaSimbolo()
 
-    lexer = Lexer('program_erro2.pasc', ts)
+    lexer = Lexer('program_1.pasc', ts)
     var = True
     while var:
         token = lexer.nex_token()

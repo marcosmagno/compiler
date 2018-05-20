@@ -26,8 +26,19 @@ class Tag_type(object):
 
 
     # Plavra chave
-    KW = "KW"
-    
+    KW_PROGRAM = "KW_PROGRAM"
+    KW_ELSE = "KW_ELSE"
+    KW_IF = "KW_IF"
+    KW_WHILE = "KW_WHILE"
+    KW_WRITE = "KW_WRITE"
+    KW_READ = "KW_READ"
+    KW_NUM = "NUM"
+    KW_CHAR = "CHAR"
+    KW_NOT = "KW_NOT"
+    KW_OR = "KW_OR"
+    KW_AND = "KW_AND"
+
+
     # Identificadores
     ID = 'ID'
 

@@ -9,7 +9,7 @@ class Token(object):
 	def getLexema(self):
 		return self.lexema
 		
-	def getClasse(self):
+	def getClass(self):
 		return self.classe
 
 	def toString(self):
