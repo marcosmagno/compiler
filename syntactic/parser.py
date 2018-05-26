@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import logging
 import sys
 import time
@@ -41,7 +43,7 @@ class Parser(object):
 
 			Todos os procedimentos para nao terminal
 
-	"""
+	    """
 
     def prog(self):
         # prog -> "program" "id" body
@@ -53,10 +55,11 @@ class Parser(object):
 
     def body(self):
         # body -> decl-list "{" stmt-list "}"
+
         if self.token.getClass() == self.tag.KW_NUM or self.token.getClass() == self.tag.KW_CHAR:
             self.decl_list()
         else:
-            if self.eat(self.tag.SMB_OBC) != True:
+            if self.eat(self.tag.SMB_OBC) != True:  # {
                 self.sinaliza_erro(
                     "Esperado { , encontrado: " + str(self.token.getLexema()))
                 sys.exit(0)
@@ -94,7 +97,7 @@ class Parser(object):
         d = self.token.getClass()
         if self.eat(d) != True:
             self.sinaliza_erro(
-                "Esperadosss num , encontrado: " + str(self.token.getLexema()))
+                "Esperados num , encontrado: " + str(self.token.getLexema()))
             sys.exit(0)
             return False
         else:
@@ -137,7 +140,7 @@ class Parser(object):
         # stmt -> assing-stmt | if-stmt | while-stmt | read-stmt | write-stmt
         if self.token.getClass() == self.tag.ID:
             self.assing_stmt()
-            
+
         elif self.token.getClass() == self.tag.KW_IF:
             self.if_stmt()
 
@@ -165,16 +168,17 @@ class Parser(object):
 
     def simple_exprt(self):
         # simple_exprt -> termA'
+        # A' -> addop term | ε
         self.term()
         if self.token.getClass() == self.tag.OP_AD or self.token.getClass() == self.tag.OP_MIN or self.token.getClass() == self.tag.KW_OR:
-            self.A_linha()  # A'
+            self.A_linha()
         else:
-            return  # produz A' vazio
+            return  # ε
 
     def term(self):
         # term -> factor-aB'
+        # B' -> mulop factor - a | ε
         self.factor_a()
-
         if self.token.getClass() == self.tag.OP_MUL or self.token.getClass() == self.tag.OP_DIV or self.token.getClass() == self.tag.KW_AND:
             self.B_linha()
         else:
@@ -207,7 +211,7 @@ class Parser(object):
         self.term()
 
     def factor(self):
-
+        # factor → “id” | constant | “(“ expression “)”
         if self.token.getClass() == self.tag.ID:
             if self.eat(self.tag.ID) != True:
                 self.sinaliza_erro(
@@ -217,7 +221,6 @@ class Parser(object):
                 return
         elif self.token.getClass() == self.tag.CON_CHAR or self.token.getClass() == self.tag.CON_NUM:
             c = self.token.getClass()
-            print "cccc", c
             if self.eat(c) != True:
                 self.sinaliza_erro(
                     "Esperados CON_NUM ou CON_CHAR , encontrado: " + str(self.token.getLexema()))
@@ -225,11 +228,23 @@ class Parser(object):
             else:
                 return
 
-        elif self.token.getClass() == self.tag.SMB_OPA:
+        elif self.token.getClass() == self.tag.SMB_OPA:  # (
             self.expression()
 
         return
 
     def expression(self):
-        print "expression"
+
+        if self.eat(self.tag.SMB_OPA) != True:
+            self.sinaliza_erro(
+                "Esperadosss ( , encontrado: " + str(self.token.getLexema()))
+            exit(0)
+
+        self.simple_exprt()
+
+        if self.eat(self.tag.SMB_CPA) != True:
+            self.sinaliza_erro(
+                "Esperadosss ) , encontrado: " + str(self.token.getLexema()))
+            exit(0)
+
         return
