@@ -154,6 +154,9 @@ class Parser(object):
         elif self.token.getClass() == self.tag.KW_READ:
             self.read_stmt()
 
+        elif self.token.getClass() == self.tag.KW_WRITE:
+            self.write_stmt()
+
     def assing_stmt(self):
         # assing-stmt -> "id" "=" simple_exprt
 
@@ -283,6 +286,33 @@ class Parser(object):
             self.sinaliza_erro(
                 "Esperado ID , encontrado: " + str(self.token.getLexema()))
             exit(0)
+
+    def write_stmt(self):
+        """
+            proceduces:
+                "write" writable
+        """
+        if self.eat(self.tag.KW_WRITE) != True:  # {
+            self.sinaliza_erro(
+                "Esperado write , encontrado: " + str(self.token.getLexema()))
+            sys.exit(0)
+
+        self.writable()
+
+    def writable(self):
+        """
+            proceduces:
+                simple-expr | "literal"
+        """
+        if self.token.getClass() == self.tag.LIT:
+            if self.eat(self.tag.KW_WRITE) != True:  # {
+                self.sinaliza_erro(
+                    "Esperado write , encontrado: " + str(self.token.getLexema()))
+                sys.exit(0)
+        else:
+            self.simple_exprt()
+
+        return
 
     def simple_exprt(self):
         # simple_exprt -> termA'
