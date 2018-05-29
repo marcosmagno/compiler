@@ -144,6 +144,9 @@ class Parser(object):
         elif self.token.getClass() == self.tag.KW_IF:
             self.if_stmt()
 
+        elif self.token.getClass() == self.tag.KW_WHILE:
+            self.while_stmt()
+
     def assing_stmt(self):
         # assing-stmt -> "id" "=" simple_exprt
 
@@ -206,7 +209,7 @@ class Parser(object):
             self.sinaliza_erro(
                 "Esperado else , encontrado: " + str(self.token.getLexema()))
             exit(0)
-            
+
         if self.eat(self.tag.SMB_OBC) != True:  # {
             self.sinaliza_erro(
                 "Esperado { , encontrado: " + str(self.token.getLexema()))
@@ -220,6 +223,43 @@ class Parser(object):
                 "Esperado } , encontrado: " + str(self.token.getLexema()))
             exit(0)
 
+    def while_stmt(self):
+        """
+            produces:
+                while-stmt → stmt-prefix “{“ stmt-list “}”
+        """
+
+        self.stmt_prefix()
+        print "voltou"
+
+        if self.eat(self.tag.SMB_OBC) != True:  # {
+            self.sinaliza_erro(
+                "Esperado { , encontrado: " + str(self.token.getLexema()))
+            sys.exit(0)
+
+        self.stmt_list()
+
+        if self.eat(self.tag.SMB_CBC) != True:  # }
+            self.sinaliza_erro(
+                "Esperado } , encontrado: " + str(self.token.getLexema()))
+            sys.exit(0)
+
+        return
+
+    def stmt_prefix(self):
+        """
+            produces:
+                "while" "(" condition ")"
+        """
+        print "chegou", self.token.getClass()
+        if self.eat(self.tag.KW_WHILE) != True:  # while
+            self.sinaliza_erro(
+                "Esperado while , encontrado: " + str(self.token.getLexema()))
+            exit(0)
+
+        self.expression()
+
+        return
 
     def simple_exprt(self):
         # simple_exprt -> termA'
@@ -241,6 +281,7 @@ class Parser(object):
 
     def factor_a(self):
         # factor-a -> factor | not factor
+
         if self.token.getClass() == self.tag.KW_NOT:
             if self.eat(self.tag.KW_NOT) != True:
                 self.sinaliza_erro(
@@ -302,7 +343,7 @@ class Parser(object):
 
         if self.eat(self.tag.SMB_CPA) != True:  # )
             self.sinaliza_erro(
-                "Esperados ) , encontrado: " + str(self.token.getLexema()))
+                "Esperado ) , encontrado: " + str(self.token.getLexema()))
             exit(0)
 
         return
