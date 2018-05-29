@@ -66,7 +66,7 @@ class Parser(object):
 
             self.stmt_list()
 
-            if self.eat(self.tag.SMB_CBC) != True:
+            if self.eat(self.tag.SMB_CBC) != True:  # }
                 self.sinaliza_erro(
                     "Esperado } , encontrado: " + str(self.token.getLexema()))
                 sys.exit(0)
@@ -160,11 +160,66 @@ class Parser(object):
         self.simple_exprt()
 
     def if_stmt(self):
-        if self.eat(self.tag.KW_IF) != True:
+        """
+            produces: 
+                if-stmt -> "if" "(" condition ")" "{" stmt-list "}" | Z  
+
+        """
+
+        # produces IF
+        if self.eat(self.tag.KW_IF) != True:  # IF
             self.sinaliza_erro(
-                "Esperadosss IF , encontrado: " + str(self.token.getLexema()))
+                "Esperado IF , encontrado: " + str(self.token.getLexema()))
             exit(0)
+
+        # produce ( and call expression
+        if self.token.getClass() == self.tag.SMB_OPA:
+            self.expression()
+
+        # prodduce { and call stm_list
+        if self.eat(self.tag.SMB_OBC) != True:  # {
+            self.sinaliza_erro(
+                "Esperado { , encontrado: " + str(self.token.getLexema()))
+            exit(0)
+
+        self.stmt_list()
+
+        # produce }
+        if self.eat(self.tag.SMB_CBC) != True:  # }
+            self.sinaliza_erro(
+                "Esperado } , encontrado: " + str(self.token.getLexema()))
+            exit(0)
+
+        # produce else
+        if self.token.getClass() == self.tag.KW_ELSE:
+            self.if_stmt_Z()
+
         return
+
+    def if_stmt_Z(self):
+        """
+            produces:
+                if-stmt_z -> "if" "(" condition ")" "{" stmt-list "}" "else" "{" stmt-list "}"
+
+        """
+        if self.eat(self.tag.KW_ELSE) != True:  # else
+            self.sinaliza_erro(
+                "Esperado else , encontrado: " + str(self.token.getLexema()))
+            exit(0)
+            
+        if self.eat(self.tag.SMB_OBC) != True:  # {
+            self.sinaliza_erro(
+                "Esperado { , encontrado: " + str(self.token.getLexema()))
+            exit(0)
+
+        self.stmt_list()
+
+        # produce }
+        if self.eat(self.tag.SMB_CBC) != True:  # }
+            self.sinaliza_erro(
+                "Esperado } , encontrado: " + str(self.token.getLexema()))
+            exit(0)
+
 
     def simple_exprt(self):
         # simple_exprt -> termA'
@@ -237,18 +292,17 @@ class Parser(object):
 
         if self.eat(self.tag.SMB_OPA) != True:  # (
             self.sinaliza_erro(
-                "Esperadosss ( , encontrado: " + str(self.token.getLexema()))
+                "Esperados ( , encontrado: " + str(self.token.getLexema()))
             exit(0)
 
         self.simple_exprt()  # expression -> simple-expr | c
 
         if self.token.getClass() == self.tag.OP_NE or self.token.getClass() == self.tag.OP_EQ or self.token.getClass() == self.tag.OP_GE or self.token.getClass() == self.tag.OP_LE or self.token.getClass() == self.tag.OP_GT or self.token.getClass() == self.tag.OP_LT:
             self.C()
-        
 
         if self.eat(self.tag.SMB_CPA) != True:  # )
             self.sinaliza_erro(
-                "Esperadosss ) , encontrado: " + str(self.token.getLexema()))
+                "Esperados ) , encontrado: " + str(self.token.getLexema()))
             exit(0)
 
         return
