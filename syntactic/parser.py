@@ -70,6 +70,10 @@ class Parser(object):
                 self.sinaliza_erro(
                     "Esperado } , encontrado: " + str(self.token.getLexema()))
                 sys.exit(0)
+            if self.token.getClass() == self.tag.EOF:
+                sys.exit(0)
+            else:
+                self.start_parse()
 
     def decl_list(self):
         # decl_lit - > decl ";" decl-list | vazio
@@ -146,6 +150,9 @@ class Parser(object):
 
         elif self.token.getClass() == self.tag.KW_WHILE:
             self.while_stmt()
+
+        elif self.token.getClass() == self.tag.KW_READ:
+            self.read_stmt()
 
     def assing_stmt(self):
         # assing-stmt -> "id" "=" simple_exprt
@@ -251,7 +258,7 @@ class Parser(object):
             produces:
                 "while" "(" condition ")"
         """
-        print "chegou", self.token.getClass()
+
         if self.eat(self.tag.KW_WHILE) != True:  # while
             self.sinaliza_erro(
                 "Esperado while , encontrado: " + str(self.token.getLexema()))
@@ -260,6 +267,22 @@ class Parser(object):
         self.expression()
 
         return
+
+    def read_stmt(self):
+        """
+            proceduces:
+                "read" "id"
+        """
+
+        if self.eat(self.tag.KW_READ) != True:  # {
+            self.sinaliza_erro(
+                "Esperado { , encontrado: " + str(self.token.getLexema()))
+            sys.exit(0)
+
+        if self.eat(self.tag.ID) != True:
+            self.sinaliza_erro(
+                "Esperado ID , encontrado: " + str(self.token.getLexema()))
+            exit(0)
 
     def simple_exprt(self):
         # simple_exprt -> termA'
