@@ -199,7 +199,7 @@ class Parser(object):
         addop = self.token.getClass()
         if self.eat(addop) != True:
             self.sinaliza_erro(
-                "Esperadosss addop , encontrado: " + str(self.token.getLexema()))
+                "Esperados addop , encontrado: " + str(self.token.getLexema()))
             exit(0)
         self.term()
 
@@ -235,16 +235,29 @@ class Parser(object):
 
     def expression(self):
 
-        if self.eat(self.tag.SMB_OPA) != True:
+        if self.eat(self.tag.SMB_OPA) != True:  # (
             self.sinaliza_erro(
                 "Esperadosss ( , encontrado: " + str(self.token.getLexema()))
             exit(0)
 
-        self.simple_exprt()
+        self.simple_exprt()  # expression -> simple-expr | c
 
-        if self.eat(self.tag.SMB_CPA) != True:
+        if self.token.getClass() == self.tag.OP_NE or self.token.getClass() == self.tag.OP_EQ or self.token.getClass() == self.tag.OP_GE or self.token.getClass() == self.tag.OP_LE or self.token.getClass() == self.tag.OP_GT or self.token.getClass() == self.tag.OP_LT:
+            self.C()
+        
+
+        if self.eat(self.tag.SMB_CPA) != True:  # )
             self.sinaliza_erro(
                 "Esperadosss ) , encontrado: " + str(self.token.getLexema()))
             exit(0)
 
         return
+
+    def C(self):
+        r = self.token.getClass()
+        if self.eat(r) != True:  # (
+            self.sinaliza_erro(
+                "Esperadosss ( , encontrado: " + str(self.token.getLexema()))
+            exit(0)
+
+        self.simple_exprt()
