@@ -7,22 +7,33 @@ from tag import Tag_type
 
 
 class Parser(object):
-    """docstring for Parser"""
+    """ This class is responsible for being part of the pasc grammar
+        Attributes:
+            lexer   (object)    : An object of class Lexer
+            tag     (object)    : An object of class Tag_type
+            token   (string)    : A string representing a token
+    """
 
     def __init__(self, lexer):
+        """ This is constructor of class Parser """
         self.lexer = lexer
         self.tag = Tag_type()
-        self.token = self.lexer.nex_token()
+        self.token = self.lexer.next_token()
 
     def sinaliza_erro(self, mensagem):
-
+        """ This method is responsible for signaling an error
+            Attributes:
+                mensagem (string)   : A string representing a erro mensagem
+        """
         print "Erro Sintatico:" + str(self.lexer.get_row())
         print mensagem
 
     def advance(self):
-        self.token = self.lexer.nex_token()
+        self.token = self.lexer.next_token()  # get next token
 
     def eat(self, recv_token):
+        """ This method is responsible for consume a token """
+
         print "eat: " + str(self.token.getClass()) + ":" + str(self.token.getLexema()) + "   " + str(recv_token) + ":" + str(self.token.getLexema())
         if (self.token.getClass() == recv_token):
             self.advance()
@@ -31,7 +42,7 @@ class Parser(object):
             return False
 
     def start_parse(self):
-        # prog -> "program"
+
         if self.token.getClass() == self.tag.KW_PROGRAM:
             self.prog()  # chama o procedimento para o nao terminal prog
         else:
@@ -39,23 +50,24 @@ class Parser(object):
                 "Esperado program, encontrado: " + str(self.token.getLexema()))
             sys.exit(0)
 
+    def prog(self):
+        """ To produce:
+                prog -> "program" "id" body(1)
         """
 
-			Todos os procedimentos para nao terminal
-
-	    """
-
-    def prog(self):
-        # prog -> "program" "id" body
-        if (self.eat(self.tag.KW_PROGRAM)):  # se for True
-            if self.eat(self.tag.ID) != True:  # espera um ID
+        if (self.eat(self.tag.KW_PROGRAM)):
+            if self.eat(self.tag.ID) != True:  # Expect an ID
                 print "Erro. Esperado ID, encontrado: ", self.token.getLexema()
                 exit(1)
         self.body()
 
     def body(self):
-        # body -> decl-list "{" stmt-list "}"
+        """ (1)
+            To produce:
+                body -> decl-list "{" stmt-list "}" (2)
+        """
 
+        # Expect a constant
         if self.token.getClass() == self.tag.KW_NUM or self.token.getClass() == self.tag.KW_CHAR:
             self.decl_list()
         else:
@@ -70,26 +82,32 @@ class Parser(object):
                 self.sinaliza_erro(
                     "Esperado } , encontrado: " + str(self.token.getLexema()))
                 sys.exit(0)
+
             if self.token.getClass() == self.tag.EOF:
                 sys.exit(0)
             else:
                 self.start_parse()
 
     def decl_list(self):
-        # decl_lit - > decl ";" decl-list | vazio
+        """ To produce:
+                decl_lit - > decl ";" decl-list (3) | vazio(4)
+        """
         self.decl()
 
-        if self.eat(self.tag.SMB_SEM) != True:  # ;
+        if self.eat(self.tag.SMB_SEM) != True:  # Expect a ;
             self.sinaliza_erro(
                 "Esperado ; , encontrado: " + str(self.token.getLexema()))
             sys.exit(0)
 
-        self.body()
+        self.body()  # Call body
         if self.token.getClass() == self.tag.SMB_OBC:  # {
             return
 
     def decl(self):
-        # decl-> type id-list
+        """ To produce:
+                decl-> type id-list (5)
+        """
+
         if self.type():
             self.id_list()
             return
@@ -97,7 +115,9 @@ class Parser(object):
             return
 
     def type(self):
-        # type -> "num" | "char"
+        """ To produce:
+                type -> "num" (6) | "char" (7)
+        """
         d = self.token.getClass()
         if self.eat(d) != True:
             self.sinaliza_erro(
@@ -108,40 +128,51 @@ class Parser(object):
             return True
 
     def id_list(self):
-        # id-list -> id | w
-        if self.eat(self.tag.ID) != True:  # espera um ID
+        """ To produce:
+                id-list -> "id" id_list' (8)
+        """
+        if self.eat(self.tag.ID) != True:  # Expect a ID
             self.sinaliza_erro(
                 "Esperado ID  , encontrado: " + str(self.token.getLexema()))
             sys.exit(1)
 
-        if self.token.getClass() == self.tag.SMB_COM:  # ,
+        if self.token.getClass() == self.tag.SMB_COM:
             self.id_list_linha()
         else:
             return
 
     def id_list_linha(self):
-        if self.eat(self.tag.SMB_COM) != True:  # ,
+        """ To produce:
+                id-list' -> "," id_list (9)
+        """
+        if self.eat(self.tag.SMB_COM) != True:  # Expect a ,
             self.sinaliza_erro(
                 "Esperados , , encontrado: " + str(self.token.getLexema()))
             sys.exit(0)
         else:
-            self.id_list()
+            self.id_list()  # (9)
 
     def stmt_list(self):
-        # stmp-list -> stmt ";" stmt-list | vazio
+        """ (2)
+            To produce:
+                stmp-list -> stmt ";" stmt-list (11) | vazio (12)
+        """
         if self.token.getClass() == self.tag.ID or self.token.getClass() == self.tag.KW_IF or self.token.getClass() == self.tag.KW_WHILE or self.token.getClass() == self.tag.KW_READ or self.token.getClass() == self.tag.KW_WRITE:
             self.stmt()
             if self.eat(self.tag.SMB_SEM) != True:
                 self.sinaliza_erro(
                     "Esperado ;  , encontrado: " + str(self.token.getLexema()))
                 sys.exit(0)
-            self.stmt_list()
 
+            self.stmt_list()  # (11)
         else:
-            return  # retorna vazio
+            return  # return to (1)
 
     def stmt(self):
-        # stmt -> assing-stmt | if-stmt | while-stmt | read-stmt | write-stmt
+        """ To produce:
+            stmt -> assing-stmt (13) | if-stmt (14) | while-stmt (15) | read-stmt (16) | write-stmt (17)
+        """
+
         if self.token.getClass() == self.tag.ID:
             self.assing_stmt()
 
@@ -158,14 +189,16 @@ class Parser(object):
             self.write_stmt()
 
     def assing_stmt(self):
-        # assing-stmt -> "id" "=" simple_exprt
+        """ To produce:
+                assing-stmt -> "id" "=" simple_exprt (18)
+        """
 
-        if self.eat(self.tag.ID) != True: 	# Id
+        if self.eat(self.tag.ID) != True: 	# Expect q id
             self.sinaliza_erro(
                 "Esperadosss ID , encontrado: " + str(self.token.getLexema()))
             exit(0)
 
-        if self.eat(self.tag.OP_ASS) != True:  # =
+        if self.eat(self.tag.OP_ASS) != True:  # Expect a =
             self.sinaliza_erro(
                 "Esperados = , encontrado: " + str(self.token.getLexema()))
             exit(0)
@@ -174,13 +207,11 @@ class Parser(object):
 
     def if_stmt(self):
         """
-            produces: 
-                if-stmt -> "if" "(" condition ")" "{" stmt-list "}" | Z  
-
+            produces:
+                if-stmt -> "if" "(" condition ")" "{" stmt-list "}" if_stmt' (19)
         """
 
-        # produces IF
-        if self.eat(self.tag.KW_IF) != True:  # IF
+        if self.eat(self.tag.KW_IF) != True:  # Expect a if
             self.sinaliza_erro(
                 "Esperado IF , encontrado: " + str(self.token.getLexema()))
             exit(0)
@@ -190,66 +221,60 @@ class Parser(object):
             self.expression()
 
         # prodduce { and call stm_list
-        if self.eat(self.tag.SMB_OBC) != True:  # {
+        if self.eat(self.tag.SMB_OBC) != True:  # Expect a {
             self.sinaliza_erro(
                 "Esperado { , encontrado: " + str(self.token.getLexema()))
             exit(0)
 
         self.stmt_list()
 
-        # produce }
-        if self.eat(self.tag.SMB_CBC) != True:  # }
+        if self.eat(self.tag.SMB_CBC) != True:  # Expect a }
             self.sinaliza_erro(
                 "Esperado } , encontrado: " + str(self.token.getLexema()))
             exit(0)
 
         # produce else
         if self.token.getClass() == self.tag.KW_ELSE:
-            self.if_stmt_Z()
+            self.if_stmt_linha()
 
         return
 
-    def if_stmt_Z(self):
+    def if_stmt_linha(self):
+        """ To produces:
+                if-stmt_linha -> "else" "{" stmt-list "}" (20) | vazio (21)
         """
-            produces:
-                if-stmt_z -> "if" "(" condition ")" "{" stmt-list "}" "else" "{" stmt-list "}"
-
-        """
-        if self.eat(self.tag.KW_ELSE) != True:  # else
+        if self.eat(self.tag.KW_ELSE) != True:  # Expect a else
             self.sinaliza_erro(
                 "Esperado else , encontrado: " + str(self.token.getLexema()))
             exit(0)
 
-        if self.eat(self.tag.SMB_OBC) != True:  # {
+        if self.eat(self.tag.SMB_OBC) != True:  # Expect a  {
             self.sinaliza_erro(
                 "Esperado { , encontrado: " + str(self.token.getLexema()))
             exit(0)
 
-        self.stmt_list()
+        self.stmt_list()  # Produc stm_list
 
-        # produce }
-        if self.eat(self.tag.SMB_CBC) != True:  # }
+        if self.eat(self.tag.SMB_CBC) != True:  # Expect a  }
             self.sinaliza_erro(
                 "Esperado } , encontrado: " + str(self.token.getLexema()))
             exit(0)
 
     def while_stmt(self):
-        """
-            produces:
-                while-stmt → stmt-prefix “{“ stmt-list “}”
+        """ To produces:
+                while-stmt → stmt-prefix “{“ stmt-list “}” (23)
         """
 
         self.stmt_prefix()
-        print "voltou"
 
-        if self.eat(self.tag.SMB_OBC) != True:  # {
+        if self.eat(self.tag.SMB_OBC) != True:  # Expect a {
             self.sinaliza_erro(
                 "Esperado { , encontrado: " + str(self.token.getLexema()))
             sys.exit(0)
 
         self.stmt_list()
 
-        if self.eat(self.tag.SMB_CBC) != True:  # }
+        if self.eat(self.tag.SMB_CBC) != True:  # Expect a }
             self.sinaliza_erro(
                 "Esperado } , encontrado: " + str(self.token.getLexema()))
             sys.exit(0)
@@ -257,12 +282,11 @@ class Parser(object):
         return
 
     def stmt_prefix(self):
-        """
-            produces:
-                "while" "(" condition ")"
+        """To produces:
+                "while" "(" condition ")" (24)
         """
 
-        if self.eat(self.tag.KW_WHILE) != True:  # while
+        if self.eat(self.tag.KW_WHILE) != True:  # Expect awhile
             self.sinaliza_erro(
                 "Esperado while , encontrado: " + str(self.token.getLexema()))
             exit(0)
@@ -272,24 +296,22 @@ class Parser(object):
         return
 
     def read_stmt(self):
-        """
-            proceduces:
-                "read" "id"
+        """To proceduces:
+                "read" "id" (25)
         """
 
-        if self.eat(self.tag.KW_READ) != True:  # {
+        if self.eat(self.tag.KW_READ) != True:  # Expect a {
             self.sinaliza_erro(
                 "Esperado { , encontrado: " + str(self.token.getLexema()))
             sys.exit(0)
 
-        if self.eat(self.tag.ID) != True:
+        if self.eat(self.tag.ID) != True:  # Expect a id
             self.sinaliza_erro(
                 "Esperado ID , encontrado: " + str(self.token.getLexema()))
             exit(0)
 
     def write_stmt(self):
-        """
-            proceduces:
+        """To proceduces:
                 "write" writable
         """
         if self.eat(self.tag.KW_WRITE) != True:  # {
@@ -300,9 +322,8 @@ class Parser(object):
         self.writable()
 
     def writable(self):
-        """
-            proceduces:
-                simple-expr | "literal"
+        """ To proceduces:
+                writable-> simple-expr (27) | "literal" (28)
         """
         if self.token.getClass() == self.tag.LIT:
             if self.eat(self.tag.KW_WRITE) != True:  # {
@@ -314,27 +335,99 @@ class Parser(object):
 
         return
 
+   def expression(self):
+        """ To proceduces:
+                expression-> simple-expr expression_linha (29)
+        """    
+        if self.eat(self.tag.SMB_OPA) != True:  # (
+            self.sinaliza_erro(
+                "Esperados ( , encontrado: " + str(self.token.getLexema()))
+            exit(0)
+
+        self.simple_exprt() 
+
+        # call expression_linha
+        if self.token.getClass() == self.tag.OP_NE or self.token.getClass() == self.tag.OP_EQ or self.token.getClass() == self.tag.OP_GE or self.token.getClass() == self.tag.OP_LE or self.token.getClass() == self.tag.OP_GT or self.token.getClass() == self.tag.OP_LT:
+            self.expression_linha()
+
+        if self.eat(self.tag.SMB_CPA) != True:  # )
+            self.sinaliza_erro(
+                "Esperado ) , encontrado: " + str(self.token.getLexema()))
+            exit(0)
+
+        return
+
+
+
+    def expression_linha(self):
+        """ To proceduces:
+                expression_linha-> relop expression (30) | vazio (31)
+            Attribue:
+                r (string): An string representing a signal reloop
+        """           
+        r = self.token.getClass()
+        if self.eat(r) != True:  # Expect a (
+            self.sinaliza_erro(
+                "Esperadosss ( , encontrado: " + str(self.token.getLexema()))
+            exit(0)
+        # call simple_exprt
+        self.simple_exprt() 
+
+
     def simple_exprt(self):
-        # simple_exprt -> termA'
-        # A' -> addop term | ε
+        """ To proceduces:
+                simple-expr-> term simple_expr_linha (32)
+        """              
         self.term()
         if self.token.getClass() == self.tag.OP_AD or self.token.getClass() == self.tag.OP_MIN or self.token.getClass() == self.tag.KW_OR:
-            self.A_linha()
+            self.simple_expr_linha()
         else:
-            return  # ε
+            return # return empty
+
+
+    def simple_expr_linha(self):
+        """ To proceduces:
+                simple_expr_linha -> term simple_expr (33) | vazio (34)
+            Attribue:
+                addop (string): An string representing a signal addop
+        """              
+        addop = self.token.getClass()
+        if self.eat(addop) != True:
+            self.sinaliza_erro(
+                "Esperados addop , encontrado: " + str(self.token.getLexema()))
+            exit(0)
+        self.term()
+
 
     def term(self):
-        # term -> factor-aB'
-        # B' -> mulop factor - a | ε
+        """ To produce:
+                term -> factor_a term_linha (35)
+        """
         self.factor_a()
+
         if self.token.getClass() == self.tag.OP_MUL or self.token.getClass() == self.tag.OP_DIV or self.token.getClass() == self.tag.KW_AND:
-            self.B_linha()
+            self.term_linha()
         else:
             return
 
-    def factor_a(self):
-        # factor-a -> factor | not factor
 
+    def term_linha(self):
+        """ To produce:
+                term_linha -> mulop factor_a term_linha (36) | vazio (37)
+            Attribute:
+                mulop  (string) : An string representing a signal addop
+        """        
+        mulop = self.token.getClass()
+        if self.eat(mulop) != True:
+            self.sinaliza_erro(
+                "Esperadosss mulop , encontrado: " + str(self.token.getLexema()))
+       
+        self.term()
+
+    def factor_a(self):
+        """ To produce:
+                factor_a -> factor (38) | not factor (39)
+        """
         if self.token.getClass() == self.tag.KW_NOT:
             if self.eat(self.tag.KW_NOT) != True:
                 self.sinaliza_erro(
@@ -344,23 +437,14 @@ class Parser(object):
         self.factor()
         return
 
-    def A_linha(self):
-        addop = self.token.getClass()
-        if self.eat(addop) != True:
-            self.sinaliza_erro(
-                "Esperados addop , encontrado: " + str(self.token.getLexema()))
-            exit(0)
-        self.term()
-
-    def B_linha(self):
-        mulop = self.token.getClass()
-        if self.eat(mulop) != True:
-            self.sinaliza_erro(
-                "Esperadosss mulop , encontrado: " + str(self.token.getLexema()))
-        self.term()
 
     def factor(self):
-        # factor → “id” | constant | “(“ expression “)”
+        """ To produce:
+                factor -> “id” (40) | constant (41) | “(“ expression “)” (42)
+            Attribute:
+                c (string) : An string representing a signal addop
+        """
+
         if self.token.getClass() == self.tag.ID:
             if self.eat(self.tag.ID) != True:
                 self.sinaliza_erro(
@@ -368,6 +452,7 @@ class Parser(object):
                 exit(0)
             else:
                 return
+                
         elif self.token.getClass() == self.tag.CON_CHAR or self.token.getClass() == self.tag.CON_NUM:
             c = self.token.getClass()
             if self.eat(c) != True:
@@ -382,30 +467,4 @@ class Parser(object):
 
         return
 
-    def expression(self):
-
-        if self.eat(self.tag.SMB_OPA) != True:  # (
-            self.sinaliza_erro(
-                "Esperados ( , encontrado: " + str(self.token.getLexema()))
-            exit(0)
-
-        self.simple_exprt()  # expression -> simple-expr | c
-
-        if self.token.getClass() == self.tag.OP_NE or self.token.getClass() == self.tag.OP_EQ or self.token.getClass() == self.tag.OP_GE or self.token.getClass() == self.tag.OP_LE or self.token.getClass() == self.tag.OP_GT or self.token.getClass() == self.tag.OP_LT:
-            self.C()
-
-        if self.eat(self.tag.SMB_CPA) != True:  # )
-            self.sinaliza_erro(
-                "Esperado ) , encontrado: " + str(self.token.getLexema()))
-            exit(0)
-
-        return
-
-    def C(self):
-        r = self.token.getClass()
-        if self.eat(r) != True:  # (
-            self.sinaliza_erro(
-                "Esperadosss ( , encontrado: " + str(self.token.getLexema()))
-            exit(0)
-
-        self.simple_exprt()
+ 
