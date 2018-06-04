@@ -59,12 +59,12 @@ class Lexer(object):
 
         if self.t != character:
             self.command = ''
-
             self.command = ''.join(map(str, str(
                 self.type_erro) + " Linha: " + str(self.row_) + " Coluna: " + str(self.column_)))
             self.erros.append(self.command)
+            
         elif self.t == character:
-            print "pass"
+
             pass
 
     def get_erros(self):
@@ -74,11 +74,12 @@ class Lexer(object):
     def close_file(self):
         self.__file.close()
 
-    def nex_token(self):
+    def next_token(self):
         """ This method handles the input file
         Scroll through each character of the file
         Returns a token when found
         """
+        
 
         self.__list_lexema = []
         while True:
@@ -370,7 +371,7 @@ class Lexer(object):
                     self.column = 1
                     self.__state = 37
                     self.panic_mode(self.row, self.column,
-                                    "Can not have line break :" " ", self.c)  # tratar esse
+                                    "Can not have line break :" " ", self.c)
 
                 elif self.c == "\"":
                     if len(self.__list_lexema) < 1:

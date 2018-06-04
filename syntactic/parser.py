@@ -335,7 +335,7 @@ class Parser(object):
 
         return
 
-   def expression(self):
+    def expression(self):
         """ To proceduces:
                 expression-> simple-expr expression_linha (29)
         """    
@@ -452,7 +452,7 @@ class Parser(object):
                 exit(0)
             else:
                 return
-                
+
         elif self.token.getClass() == self.tag.CON_CHAR or self.token.getClass() == self.tag.CON_NUM:
             c = self.token.getClass()
             if self.eat(c) != True:
