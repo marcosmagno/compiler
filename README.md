@@ -5,5 +5,5 @@ Compiler PASC
 > python 2.7
 
 1. Run
-> python run.py --file [nome de um arquivo] [defaul: program_1.pasc]
+> python run.py --file [nome de um arquivo] [default: program_1.pasc]
 
